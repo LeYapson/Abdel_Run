@@ -30,7 +30,7 @@ Clone the project
 Go to the project directory
 
 ```bash
-  cd Abdel_Run
+  cd Abdel_Run/cmd
 ```
 
 Start the game
