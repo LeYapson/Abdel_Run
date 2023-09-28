@@ -13,14 +13,16 @@ type Game struct{}
 var abdel *player.Player
 
 func (g *Game) Update() error {
-	// Gérer les entrées pour déplacer Abdel
 	if ebiten.IsKeyPressed(ebiten.KeyLeft) {
 		abdel.MoveLeft()
 	} else if ebiten.IsKeyPressed(ebiten.KeyRight) {
 		abdel.MoveRight()
+	} else {
+		abdel.Moving = false
 	}
 	return nil
 }
+
 
 func (g *Game) Draw(screen *ebiten.Image) {
 	// Remplir l'écran avec une couleur de fond (ici noir)
@@ -45,13 +47,13 @@ func (g *Game) Draw(screen *ebiten.Image) {
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
-	return 640, 480 // Taille initiale de la fenêtre
+	return 1024, 680 // Taille initiale de la fenêtre
 }
 
 func main() {
 	abdel = player.New()
 
-	ebiten.SetWindowSize(640, 480)
+	ebiten.SetWindowSize(1024, 600)
 	ebiten.SetWindowTitle("Abdel_Run")
 	game := &Game{}
 	if err := ebiten.RunGame(game); err != nil {
