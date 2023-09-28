@@ -5,8 +5,10 @@ package main
 import (
 	"image/color"
 	"log"
-	"github.com/hajimehoshi/ebiten/v2"
+
 	"github.com/LeYapson/Abdel_Run/internal/player"
+	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
 
 // Définition du type Game, qui est une struct vide.
@@ -33,7 +35,8 @@ func (g *Game) Update() error {
 // La méthode Draw est appelée à chaque frame pour gérer le rendu graphique.
 func (g *Game) Draw(screen *ebiten.Image) {
 	// Définit la couleur de fond de l'écran à noir.
-	screen.Fill(color.Black)
+	screen.Fill(color.RGBA{0x80, 0xa0, 0xc0, 0xff})
+	ebitenutil.DebugPrintAt(screen, "Hello World", 0, 150)
 
 	// Crée une image pour représenter Abdel. Ici, il est représenté par un rectangle blanc.
 	abdelRect := ebiten.NewImage(50, 50)
@@ -45,22 +48,22 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	case player.Left:
 		abdelX = 50
 	case player.Center:
-		abdelX = 295
+		abdelX = 225
 	case player.Right:
-		abdelX = 540
+		abdelX = 400
 	}
 
 	// Prépare les options de dessin pour Abdel.
 	opts := &ebiten.DrawImageOptions{}
-	opts.GeoM.Translate(float64(abdelX), 215)
-	
+	opts.GeoM.Translate(float64(abdelX), 500)
+
 	// Dessine l'image d'Abdel sur l'écran.
 	screen.DrawImage(abdelRect, opts)
 }
 
 // La méthode Layout définit la taille de la fenêtre.
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
-	return 1024, 680
+	return 500, 600
 }
 
 // La fonction main est le point d'entrée du programme.
