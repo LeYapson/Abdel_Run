@@ -36,6 +36,7 @@ func main() {
 	bgLogo := rl.LoadTexture("../assets/images/Logo.jpg")
 	bgImage := rl.LoadTexture("../assets/images/TitleScreen.jpg")
 	bgMusic := rl.LoadMusicStream("../assets/sounds/AbdelRunSong.ogg")
+	bgSettings := rl.LoadTexture("../assets/images/Settings.png")
 	//gifAbdel := rl.LoadImageAnim("../assets/abdel_run.gif", p)
 
 	for !rl.WindowShouldClose() {
@@ -113,6 +114,7 @@ func main() {
 			rl.EndDrawing()
 		case 3:
 			rl.BeginDrawing()
+			rl.DrawTexture(bgSettings, 0, 0, rl.White)
 			rl.ClearBackground(rl.Green)
 			rl.DrawText("Settings", screenWidth/2-100, 0, 50, rl.Black)
 
