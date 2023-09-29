@@ -46,7 +46,7 @@ func TitleScreen() {
 					if button.Text == "Quit" {
 						rl.EndDrawing()
 						rl.UnloadMusicStream(bgMusic) // Libérer la musique de la mémoire
-						rl.CloseAudioDevice() // Fermer le périphérique audio
+						rl.CloseAudioDevice()         // Fermer le périphérique audio
 						rl.CloseWindow()
 						return
 					}
