@@ -73,8 +73,13 @@ func main() {
 							rl.CloseWindow()
 							return
 						case "Play":
+							rl.UnloadMusicStream(bgMusic)
+							rl.CloseAudioDevice()
 							currentScreen = 2
+						case "Settings":
+							currentScreen = 3
 						}
+
 					}
 				}
 				rl.DrawRectangleRec(button.Bounds, color)
@@ -102,7 +107,14 @@ func main() {
 			rl.DrawText("PRESS SPACE to JUMP", 10, 0, 20, rl.Gray)
 			rl.DrawRectangleRec(player, rl.Red)
 			rl.EndDrawing()
+		case 3:
+			rl.BeginDrawing()
+			rl.ClearBackground(rl.Green)
+			rl.DrawText("Settings", 10, 0, 20, rl.Gray)
+
+			rl.EndDrawing()
 		}
+
 	}
 
 	rl.UnloadTexture(bgImage)
