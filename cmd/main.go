@@ -110,8 +110,36 @@ func main() {
 		case 3:
 			rl.BeginDrawing()
 			rl.ClearBackground(rl.Green)
-			rl.DrawText("Settings", 10, 0, 20, rl.Gray)
+			rl.DrawText("Settings", screenWidth/2-100, 0, 50, rl.Black)
 
+			buttons := []struct {
+				Bounds rl.Rectangle
+				Text   string
+			}{
+				{rl.NewRectangle(screenWidth/20, screenHeight/20, 150, 40), "Back"},
+				{rl.NewRectangle(screenWidth-(150+screenWidth/20), screenHeight-(40+screenHeight/20), 150, 40), "Quit"},
+			}
+
+			for _, button := range buttons {
+				color := rl.Yellow
+				if rl.CheckCollisionPointRec(rl.GetMousePosition(), button.Bounds) {
+					color = rl.DarkGray
+					if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
+						switch button.Text {
+						case "Back":
+							currentScreen = 1
+						case "Quit":
+							rl.UnloadMusicStream(bgMusic)
+							rl.CloseAudioDevice()
+							rl.CloseWindow()
+							return
+						}
+
+					}
+				}
+				rl.DrawRectangleRec(button.Bounds, color)
+				rl.DrawText(button.Text, int32(button.Bounds.X+button.Bounds.Width/2)-rl.MeasureText(button.Text, 20)/2, int32(button.Bounds.Y+10), 20, rl.Black)
+			}
 			rl.EndDrawing()
 		}
 
