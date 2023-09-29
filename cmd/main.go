@@ -6,6 +6,7 @@ import (
 	"image/draw"
 	"image/gif"
 	"log"
+	"math/rand"
 	"os"
 
 	"github.com/LeYapson/Abdel_Run/internal/player"
@@ -13,13 +14,49 @@ import (
 )
 
 type Game struct {
-	gifImages    []*ebiten.Image
-	currentFrame int
-	counter      int
-	delays       []int
+	gifImages            []*ebiten.Image
+	currentFrame         int
+	counter              int
+	delays               []int
+	obstacles            []*Obstacle
+	obstacleSpawnCounter int
+}
+
+type Obstacle struct {
+	X, Y  float64
+	Type  int
+	Lane  player.Position
+	Image *ebiten.Image
 }
 
 var abdel *player.Player
+
+const obstacleSpawnInterval = 60 // par exemple, un nouvel obstacle toutes les 60 frames
+
+func (g *Game) spawnObstacle() {
+	// Pour l'instant, nous ajoutons un obstacle simple, à améliorer plus tard
+	path := rand.Intn(3) // 0: gauche, 1: centre, 2: droite
+
+	var x float64
+	switch path {
+	case 0:
+		x = 50
+	case 1:
+		x = 295
+	case 2:
+		x = 540
+	}
+
+	obstacle := &Obstacle{
+		X:     x,
+		Y:     0, // en haut de l'écran
+		Type:  1,
+		Image: ebiten.NewImage(50, 50), // une image simple pour l'instant
+	}
+	obstacle.Image.Fill(color.RGBA{255, 0, 0, 255}) // rempli en rouge
+
+	g.obstacles = append(g.obstacles, obstacle)
+}
 
 func (g *Game) Update() error {
 	if ebiten.IsKeyPressed(ebiten.KeyLeft) {
@@ -30,35 +67,72 @@ func (g *Game) Update() error {
 		abdel.Moving = false
 	}
 
-	// Update GIF animation
-	g.counter++
-	if g.counter > g.delays[g.currentFrame] {
-		g.currentFrame = (g.currentFrame + 1) % len(g.gifImages)
-		g.counter = 0
+	g.obstacleSpawnCounter++
+	if g.obstacleSpawnCounter >= obstacleSpawnInterval {
+		g.spawnObstacle()
+		g.obstacleSpawnCounter = 0
+
+		// Update GIF animation
+		g.counter++
+		if g.counter > g.delays[g.currentFrame] {
+			g.currentFrame = (g.currentFrame + 1) % len(g.gifImages)
+			g.counter = 0
+		}
 	}
+
+	for i, obs := range g.obstacles {
+        obs.Y += 10 // définissez une vitesse constante pour les obstacles
+        if obs.Y > 600 {
+            g.obstacles = append(g.obstacles[:i], g.obstacles[i+1:]...)
+        }
+	}
+
+	
+
+	for _, obs := range g.obstacles {
+        if isColliding(obs, abdel) {
+            // Collision détectée! Traitez ici (arrêtez le jeu, réduisez les vies, etc.)
+        }
+    }
+
 	return nil
 }
 
+
+
+
+
 func (g *Game) Draw(screen *ebiten.Image) {
-	screen.Fill(color.Black)
+	screen.Fill(color.RGBA{0x80, 0xa0, 0xc0, 0xff})
 
 	var abdelX int
 	switch abdel.Pos {
-	case player.Left:
-		abdelX = 50
+	case player.Position.Left:
+		abdelX = 25
 	case player.Center:
-		abdelX = 295
+		abdelX = 225
 	case player.Right:
-		abdelX = 540
+		abdelX = 425
 	}
 
+	log.Println("Abdel position", abdelX)
+
 	opts := &ebiten.DrawImageOptions{}
-	opts.GeoM.Translate(float64(abdelX), 215)
+	opts.GeoM.Translate(float64(abdelX), 500)
 	screen.DrawImage(g.gifImages[g.currentFrame], opts)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
-	return 1024, 680
+	return 500, 600
+}
+
+func isColliding(obs *Obstacle, ply *player.Player) bool {
+    // Récupérer les dimensions et positions des rectangles représentant le joueur et l'obstacle.
+    playerRect := image.Rect(int(ply.Pos.X), int(ply.Pos.Y), int(ply.Pos.X)+64, int(ply.Pos.Y)+64)
+    obstacleRect := image.Rect(int(obs.X), int(obs.Y), int(obs.X)+obs.Width, int(obs.Y)+obs.Height)
+
+    // Vérifier si les rectangles se chevauchent.
+    return playerRect.Overlaps(obstacleRect)
 }
 
 func loadGIF(path string) ([]*ebiten.Image, []int, error) {
