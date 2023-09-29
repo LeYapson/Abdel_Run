@@ -1,108 +1,67 @@
 package main
 
 import (
-	"image"
-	"image/color"
-	"image/draw"
-	"image/gif"
-	"log"
-	"os"
-
-	"github.com/LeYapson/Abdel_Run/internal/player"
-	"github.com/hajimehoshi/ebiten/v2"
+	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
-type Game struct {
-	gifImages    []*ebiten.Image
-	currentFrame int
-	counter      int
-	delays       []int
-}
-
-var abdel *player.Player
-
-func (g *Game) Update() error {
-	if ebiten.IsKeyPressed(ebiten.KeyLeft) {
-		abdel.MoveLeft()
-	} else if ebiten.IsKeyPressed(ebiten.KeyRight) {
-		abdel.MoveRight()
-	} else {
-		abdel.Moving = false
-	}
-
-	// Update GIF animation
-	g.counter++
-	if g.counter > g.delays[g.currentFrame] {
-		g.currentFrame = (g.currentFrame + 1) % len(g.gifImages)
-		g.counter = 0
-	}
-	return nil
-}
-
-func (g *Game) Draw(screen *ebiten.Image) {
-	screen.Fill(color.Black)
-
-	var abdelX int
-	switch abdel.Pos {
-	case player.Left:
-		abdelX = 50
-	case player.Center:
-		abdelX = 295
-	case player.Right:
-		abdelX = 540
-	}
-
-	opts := &ebiten.DrawImageOptions{}
-	opts.GeoM.Translate(float64(abdelX), 215)
-	screen.DrawImage(g.gifImages[g.currentFrame], opts)
-}
-
-func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
-	return 1024, 680
-}
-
-func loadGIF(path string) ([]*ebiten.Image, []int, error) {
-	file, err := os.Open(path)
-	if err != nil {
-		return nil, nil, err
-	}
-	defer file.Close()
-
-	g, err := gif.DecodeAll(file)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	images := make([]*ebiten.Image, len(g.Image))
-	delays := make([]int, len(g.Image))
-	previous := image.NewRGBA(g.Image[0].Bounds())
-
-	for i, img := range g.Image {
-		draw.Draw(previous, img.Bounds(), img, image.Point{}, draw.Over)
-		rgba := image.NewRGBA(g.Image[0].Bounds())
-		draw.Draw(rgba, g.Image[0].Bounds(), previous, image.Point{}, draw.Src)
-		images[i] = ebiten.NewImageFromImage(rgba)
-		delays[i] = g.Delay[i]
-	}
-	return images, delays, nil
-}
+const (
+	screenWidth  = 1024
+	screenHeight = 600
+)
 
 func main() {
-	abdel = player.New()
+	rl.InitWindow(screenWidth, screenHeight, "ABDEL RUN!!!")
+	rl.SetTargetFPS(60)
 
-	// Load the GIF for Abdel
-	gifImages, delays, err := loadGIF("../assets/images/abdel_run.gif")
-	if err != nil {
-		log.Fatalf("Error loading Abdel's GIF: %v", err)
+	rl.InitAudioDevice() // Initialise le module audio
+
+	// Charger l'image de fond
+	bgImage := rl.LoadTexture("../assets/images/TitleScreen.jpg")
+	// Charger la musique de fond
+	bgMusic := rl.LoadMusicStream("../assets/sounds/AbdelRunSong.ogg")
+	rl.PlayMusicStream(bgMusic)
+
+	buttons := []struct {
+		Bounds rl.Rectangle
+		Text   string
+	}{
+		{rl.NewRectangle(screenWidth/2-75, screenHeight/2-40, 150, 40), "Play"},
+		{rl.NewRectangle(screenWidth/2-75, screenHeight/2+10, 150, 40), "Settings"},
+		{rl.NewRectangle(screenWidth/2-75, screenHeight/2+60, 150, 40), "Quit"},
 	}
 
-	ebiten.SetWindowSize(1024, 600)
-	ebiten.SetWindowTitle("Abdel_Run")
-	game := &Game{
-		gifImages: gifImages,
-		delays:    delays,
+	for !rl.WindowShouldClose() {
+		rl.UpdateMusicStream(bgMusic) // Mettre à jour le flux de la musique
+
+		rl.BeginDrawing()
+		rl.ClearBackground(rl.White)
+		// Dessiner l'image de fond
+		rl.DrawTexture(bgImage, 0, 0, rl.White)
+
+		for _, button := range buttons {
+			color := rl.Gray
+			if rl.CheckCollisionPointRec(rl.GetMousePosition(), button.Bounds) {
+				color = rl.DarkGray
+				if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
+					if button.Text == "Quit" {
+						rl.EndDrawing()
+						rl.UnloadMusicStream(bgMusic) // Libérer la musique de la mémoire
+						rl.CloseAudioDevice() // Fermer le périphérique audio
+						rl.CloseWindow()
+						return
+					}
+					// Gérer les autres boutons ici
+				}
+			}
+			rl.DrawRectangleRec(button.Bounds, color)
+			rl.DrawText(button.Text, int32(button.Bounds.X+button.Bounds.Width/2)-rl.MeasureText(button.Text, 20)/2, int32(button.Bounds.Y+10), 20, rl.Black)
+		}
+
+		rl.EndDrawing()
 	}
-	if err := ebiten.RunGame(game); err != nil {
-		log.Fatal(err)
-	}
+
+	rl.UnloadMusicStream(bgMusic) // Libérer la musique de la mémoire
+	rl.UnloadTexture(bgImage)     // N'oubliez pas de libérer l'image de la mémoire également
+	rl.CloseAudioDevice()         // Fermer le périphérique audio
+	rl.CloseWindow()
 }
