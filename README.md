@@ -1,7 +1,7 @@
 
 # Abdel-Run
 
-Abdel_Run is an exciting endless runner game that combines traditional jumping mechanics with advanced pathfinding and artificial intelligence to challenge players in unique ways.
+Abdel_Run is an exciting endless runner game based on the game geometry dash that combines traditional jumping mechanics with advanced pathfinding and artificial intelligence to challenge players in unique ways.
 
 
 
@@ -9,8 +9,6 @@ Abdel_Run is an exciting endless runner game that combines traditional jumping m
 ## Features
 
 -Dynamic Tracks: Multiple lanes or paths that players can switch between, powered by advanced pathfinding algorithms.
-
--Adaptive AI Opponent: Compete against a dynamic AI that observes your strategies and adapts in real-time.
 
 -Player Behavior Prediction: The game anticipates your moves and adjusts obstacles accordingly.
 
@@ -42,13 +40,9 @@ Start the game
 
 ## Gameplay
 
--Use the arrow keys to move Abdel left or right between lanes.
+-Use the space bar to make Abdel jump and choose between up and down lanes sometimes.
 
--Press the spacebar to jump over obstacles.
-
--Collect power-ups and bonuses to enhance your gameplay.
-
--Avoid obstacles and compete against the adaptive AI for the highest score.
+-Avoid obstacles and go far as possible to make the highest score
 
 
 
