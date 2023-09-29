@@ -29,9 +29,14 @@ func main() {
 	gravity := float32(1.0)
 	jumpStrength := float32(-20.0)
 
+	//animFrames := int32(0)
+	//p := &animFrames
+
 	// Charger l'image de fond et la musique une seule fois
+	bgLogo := rl.LoadTexture("../assets/images/Logo.jpg")
 	bgImage := rl.LoadTexture("../assets/images/TitleScreen.jpg")
 	bgMusic := rl.LoadMusicStream("../assets/sounds/AbdelRunSong.ogg")
+	//gifAbdel := rl.LoadImageAnim("../assets/abdel_run.gif", p)
 
 	for !rl.WindowShouldClose() {
 		rl.UpdateMusicStream(bgMusic)
@@ -39,7 +44,7 @@ func main() {
 		switch currentScreen {
 		case 0:
 			rl.BeginDrawing()
-			rl.ClearBackground(rl.Red)
+			rl.DrawTexture(bgLogo, 0, 0, rl.White)
 			rl.EndDrawing()
 			frameCounter++
 			if frameCounter > 120 {
@@ -49,7 +54,6 @@ func main() {
 
 		case 1:
 			rl.BeginDrawing()
-			rl.ClearBackground(rl.White)
 			rl.DrawTexture(bgImage, 0, 0, rl.White)
 
 			buttons := []struct {
