@@ -24,7 +24,7 @@ Abdel_Run is an exciting endless runner game that combines traditional jumping m
 Clone the project
 
 ```bash
-  git clone https://github.com/YourUsername/Abdel_Run.git
+  git clone https://github.com/LeYapson/Abdel_Run.git
 ```
 
 Go to the project directory
