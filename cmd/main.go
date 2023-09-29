@@ -33,7 +33,7 @@ func main() {
 	//p := &animFrames
 
 	// Charger l'image de fond et la musique une seule fois
-	bgLogo := rl.LoadTexture("../assets/images/Logo.jpg")
+	bgLogo := rl.LoadTexture("../assets/images/logo.jpg")
 	bgImage := rl.LoadTexture("../assets/images/TitleScreen.jpg")
 	bgMusic := rl.LoadMusicStream("../assets/sounds/AbdelRunSong.ogg")
 	bgSettings := rl.LoadTexture("../assets/images/Settings.png")
