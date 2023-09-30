@@ -2,6 +2,7 @@ package main
 
 import (
 	rl "github.com/gen2brain/raylib-go/raylib"
+	//rg "github.com/gen2brain/raylib-go/raygui"
 )
 
 const (
@@ -28,6 +29,8 @@ func main() {
 	velocity := float32(0.0)
 	gravity := float32(1.0)
 	jumpStrength := float32(-20.0)
+	ratioArrondiRec := float32(0.5)
+	segmentRec := int32(0)
 
 	//animFrames := int32(0)
 	//p := &animFrames
@@ -87,12 +90,13 @@ func main() {
 
 					}
 				}
-				rl.DrawRectangleRec(button.Bounds, color)
+				rl.DrawRectangleRounded(button.Bounds, ratioArrondiRec, segmentRec, color)
 				rl.DrawText(button.Text, int32(button.Bounds.X+button.Bounds.Width/2)-rl.MeasureText(button.Text, 20)/2, int32(button.Bounds.Y+10), 20, rl.Black)
 			}
 			rl.EndDrawing()
 
 		case 2:
+
 			if rl.IsKeyPressed(rl.KeySpace) && !isJumping {
 				isJumping = true
 				velocity = jumpStrength
@@ -116,7 +120,7 @@ func main() {
 			rl.BeginDrawing()
 			rl.DrawTexture(bgSettings, 0, 0, rl.White)
 			rl.ClearBackground(rl.Green)
-			rl.DrawText("Settings", screenWidth/2-100, 0, 50, rl.Black)
+			rl.DrawText("Settings", screenWidth/2-150, 0, 50, rl.Black)
 
 			buttons := []struct {
 				Bounds rl.Rectangle
@@ -143,7 +147,7 @@ func main() {
 
 					}
 				}
-				rl.DrawRectangleRec(button.Bounds, color)
+				rl.DrawRectangleRounded(button.Bounds, ratioArrondiRec, segmentRec, color)
 				rl.DrawText(button.Text, int32(button.Bounds.X+button.Bounds.Width/2)-rl.MeasureText(button.Text, 20)/2, int32(button.Bounds.Y+10), 20, rl.Black)
 			}
 			rl.EndDrawing()
