@@ -1,8 +1,10 @@
 package main
 
 import (
+	"strconv"
+
+	rg "github.com/gen2brain/raylib-go/raygui"
 	rl "github.com/gen2brain/raylib-go/raylib"
-	//rg "github.com/gen2brain/raylib-go/raygui"
 )
 
 const (
@@ -10,9 +12,11 @@ const (
 	screenHeight = 600
 )
 
+var fpsInitals = int32(60)
+
 func main() {
 	rl.InitWindow(screenWidth, screenHeight, "ABDEL RUN!!!")
-	rl.SetTargetFPS(60)
+	rl.SetTargetFPS(fpsInitals)
 	rl.InitAudioDevice() // Initialise le module audio
 
 	frameCounter := 0
@@ -116,6 +120,7 @@ func main() {
 			rl.DrawText("PRESS SPACE to JUMP", 10, 0, 20, rl.Gray)
 			rl.DrawRectangleRec(player, rl.Red)
 			rl.EndDrawing()
+
 		case 3:
 			rl.BeginDrawing()
 			rl.DrawTexture(bgSettings, 0, 0, rl.White)
@@ -130,6 +135,12 @@ func main() {
 				{rl.NewRectangle(screenWidth-(150+screenWidth/20), screenHeight-(40+screenHeight/20), 150, 40), "Quit"},
 			}
 
+			//Gestionnaire de FPS
+			fpsSelect := rg.SliderBar(rl.NewRectangle(640, 40, 105, 20), "fps", "", 60, 30, 144)
+			s1 := strconv.FormatInt(int64(fpsSelect), 10)
+			rl.DrawText(s1, screenWidth/2-150, screenHeight-50, 50, rl.Black)
+
+			//Création et fonctionnalité des boutons Back et Quit
 			for _, button := range buttons {
 				color := rl.Yellow
 				if rl.CheckCollisionPointRec(rl.GetMousePosition(), button.Bounds) {
