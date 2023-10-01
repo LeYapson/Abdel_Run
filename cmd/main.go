@@ -1,6 +1,9 @@
 package main
 
 import (
+	"strconv"
+
+	rg "github.com/gen2brain/raylib-go/raygui"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
@@ -9,19 +12,11 @@ const (
 	screenHeight = 600
 )
 
-type Platform struct {
-	Rect  rl.Rectangle
-	Color rl.Color
-}
-
-type Obstacle struct {
-	Rect  rl.Rectangle
-	Color rl.Color
-}
+var fpsInitals = int32(60)
 
 func main() {
 	rl.InitWindow(screenWidth, screenHeight, "ABDEL RUN!!!")
-	rl.SetTargetFPS(60)
+	rl.SetTargetFPS(fpsInitals)
 	rl.InitAudioDevice() // Initialise le module audio
 
 	frameCounter := 0
@@ -38,6 +33,8 @@ func main() {
 	velocity := float32(0.0)
 	gravity := float32(1.0)
 	jumpStrength := float32(-20.0)
+	ratioArrondiRec := float32(0.5)
+	segmentRec := int32(0)
 
 	//animFrames := int32(0)
 	//p := &animFrames
@@ -121,12 +118,13 @@ func main() {
 
 					}
 				}
-				rl.DrawRectangleRec(button.Bounds, color)
+				rl.DrawRectangleRounded(button.Bounds, ratioArrondiRec, segmentRec, color)
 				rl.DrawText(button.Text, int32(button.Bounds.X+button.Bounds.Width/2)-rl.MeasureText(button.Text, 20)/2, int32(button.Bounds.Y+10), 20, rl.Black)
 			}
 			rl.EndDrawing()
 
 		case 2:
+
 			if rl.IsKeyPressed(rl.KeySpace) && !isJumping {
 				isJumping = true
 				velocity = jumpStrength
@@ -154,11 +152,12 @@ func main() {
 			rl.DrawText("PRESS SPACE to JUMP", 10, 0, 20, rl.Gray)
 			rl.DrawRectangleRec(player, rl.Red)
 			rl.EndDrawing()
+
 		case 3:
 			rl.BeginDrawing()
 			rl.DrawTexture(bgSettings, 0, 0, rl.White)
 			rl.ClearBackground(rl.Green)
-			rl.DrawText("Settings", screenWidth/2-100, 0, 50, rl.Black)
+			rl.DrawText("Settings", screenWidth/2-150, 0, 50, rl.Black)
 
 			buttons := []struct {
 				Bounds rl.Rectangle
@@ -168,6 +167,12 @@ func main() {
 				{rl.NewRectangle(screenWidth-(150+screenWidth/20), screenHeight-(40+screenHeight/20), 150, 40), "Quit"},
 			}
 
+			//Gestionnaire de FPS
+			fpsSelect := rg.SliderBar(rl.NewRectangle(640, 40, 105, 20), "fps", "", 60, 30, 144)
+			s1 := strconv.FormatInt(int64(fpsSelect), 10)
+			rl.DrawText(s1, screenWidth/2-150, screenHeight-50, 50, rl.Black)
+
+			//Création et fonctionnalité des boutons Back et Quit
 			for _, button := range buttons {
 				color := rl.Yellow
 				if rl.CheckCollisionPointRec(rl.GetMousePosition(), button.Bounds) {
@@ -185,7 +190,7 @@ func main() {
 
 					}
 				}
-				rl.DrawRectangleRec(button.Bounds, color)
+				rl.DrawRectangleRounded(button.Bounds, ratioArrondiRec, segmentRec, color)
 				rl.DrawText(button.Text, int32(button.Bounds.X+button.Bounds.Width/2)-rl.MeasureText(button.Text, 20)/2, int32(button.Bounds.Y+10), 20, rl.Black)
 			}
 			rl.EndDrawing()
