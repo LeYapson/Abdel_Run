@@ -46,30 +46,6 @@ func main() {
 	bgSettings := rl.LoadTexture("../assets/images/Settings.png")
 	//gifAbdel := rl.LoadImageAnim("../assets/abdel_run.gif", p)
 
-	// Créer des plateformes et des obstacles
-	var platforms []Platform
-	var obstacles []Obstacle
-
-	lastPlatformHeight := float32(screenHeight) - 50.0 // la hauteur de départ de la première plateforme
-	for i := 0; i < 5; i++ {
-		platformWidth := float32(rl.GetRandomValue(200, 400)) // largeur aléatoire entre 200 et 400
-		platformHeight := float32(20)                         // hauteur fixe pour une plateforme
-		platformX := float32(rl.GetRandomValue(0, int32(screenWidth)-400))
-		platformY := lastPlatformHeight - float32(rl.GetRandomValue(100, 150)) // espace entre 100 et 150
-
-		platforms = append(platforms, Platform{Rect:  rl.NewRectangle(platformX, platformY, platformWidth, platformHeight),Color: rl.Blue,})
-
-		// Ajouter un obstacle sur la plateforme
-		obstacleWidth := float32(40)
-		obstacleHeight := float32(40)
-		obstacleX := platformX + float32(rl.GetRandomValue(10, int32(platformWidth)-50))
-		obstacleY := platformY - obstacleHeight
-
-		obstacles = append(obstacles, Obstacle{Rect:  rl.NewRectangle(obstacleX, obstacleY, obstacleWidth, obstacleHeight),Color: rl.Red})
-
-		lastPlatformHeight = platformY
-	}
-
 	for !rl.WindowShouldClose() {
 		rl.UpdateMusicStream(bgMusic)
 
@@ -140,12 +116,6 @@ func main() {
 			}
 
 			// Dessinez les plateformes et les obstacles
-		for _, p := range platforms {
-			rl.DrawRectangleRec(p.Rect, p.Color)
-		}
-		for _, o := range obstacles {
-			rl.DrawRectangleRec(o.Rect, o.Color)
-		}
 
 			rl.BeginDrawing()
 			rl.ClearBackground(rl.White)
