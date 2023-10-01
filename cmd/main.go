@@ -12,11 +12,11 @@ const (
 	screenHeight = 600
 )
 
-var fpsInitals = int32(60)
+var fps = int32(60)
 
 func main() {
 	rl.InitWindow(screenWidth, screenHeight, "ABDEL RUN!!!")
-	rl.SetTargetFPS(fpsInitals)
+	rl.SetTargetFPS(fps)
 	rl.InitAudioDevice() // Initialise le module audio
 
 	frameCounter := 0
@@ -64,6 +64,12 @@ func main() {
 			rl.BeginDrawing()
 			rl.DrawTexture(bgImage, 0, 0, rl.White)
 
+			if !rl.IsMusicStreamPlaying(bgMusic) {
+				//rl.UpdateMusicStream(bgMusic)
+				//rl.ResumeMusicStream(bgMusic)
+				rl.UpdateMusicStream(bgMusic)
+				rl.PlayMusicStream(bgMusic)
+			}
 			buttons := []struct {
 				Bounds rl.Rectangle
 				Text   string
@@ -85,8 +91,7 @@ func main() {
 							rl.CloseWindow()
 							return
 						case "Play":
-							rl.UnloadMusicStream(bgMusic)
-							rl.CloseAudioDevice()
+							rl.StopMusicStream(bgMusic)
 							currentScreen = 2
 						case "Settings":
 							currentScreen = 3
@@ -101,26 +106,53 @@ func main() {
 
 		case 2:
 
+			//Saut du personnage
 			if rl.IsKeyPressed(rl.KeySpace) && !isJumping {
 				isJumping = true
 				velocity = jumpStrength
 			}
 
+			//Retombée du personnage
 			if isJumping {
 				player.Y += velocity
 				velocity += gravity
-				if player.Y > screenHeight-50 {
-					player.Y = screenHeight - 50
+				if player.Y > screenHeight-player.Height {
+					player.Y = screenHeight - player.Height
 					isJumping = false
 				}
 			}
-
-			// Dessinez les plateformes et les obstacles
 
 			rl.BeginDrawing()
 			rl.ClearBackground(rl.White)
 			rl.DrawText("PRESS SPACE to JUMP", 10, 0, 20, rl.Gray)
 			rl.DrawRectangleRec(player, rl.Red)
+
+			//Création du bouton back
+			buttons := []struct {
+				Bounds rl.Rectangle
+				Text   string
+			}{
+				{rl.NewRectangle(screenWidth/20, screenHeight/20, 150, 40), "Back"},
+			}
+
+			//Fonctionnalité du bouton
+			for _, button := range buttons {
+				color := rl.Yellow
+				if rl.CheckCollisionPointRec(rl.GetMousePosition(), button.Bounds) {
+					color = rl.DarkGray
+					if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
+						switch button.Text {
+						case "Back":
+							currentScreen = 1
+						}
+					}
+				}
+
+				//Affichage du bouton
+				rl.DrawRectangleRounded(button.Bounds, ratioArrondiRec, segmentRec, color)
+				rl.DrawText(button.Text, int32(button.Bounds.X+button.Bounds.Width/2)-rl.MeasureText(button.Text, 20)/2, int32(button.Bounds.Y+10), 20, rl.Black)
+			}
+
 			rl.EndDrawing()
 
 		case 3:
@@ -129,6 +161,7 @@ func main() {
 			rl.ClearBackground(rl.Green)
 			rl.DrawText("Settings", screenWidth/2-150, 0, 50, rl.Black)
 
+			//Boutons back et quit dans settings
 			buttons := []struct {
 				Bounds rl.Rectangle
 				Text   string
@@ -138,9 +171,14 @@ func main() {
 			}
 
 			//Gestionnaire de FPS
-			fpsSelect := rg.SliderBar(rl.NewRectangle(640, 40, 105, 20), "fps", "", 60, 30, 144)
-			s1 := strconv.FormatInt(int64(fpsSelect), 10)
-			rl.DrawText(s1, screenWidth/2-150, screenHeight-50, 50, rl.Black)
+			stringFPS := strconv.FormatInt(int64(fps), 10)
+			rl.DrawText(stringFPS, screenWidth/2-100, screenHeight-50, 50, rl.Black)
+			recSelectFPS := rl.NewRectangle(300, 250, 105, 20)
+			fps = int32(rg.SliderBar(recSelectFPS, "fps", "", float32(fps), 30, 144))
+			rl.SetTargetFPS(fps)
+
+			//Affiche les FPS
+			rl.DrawFPS(0, 0)
 
 			//Création et fonctionnalité des boutons Back et Quit
 			for _, button := range buttons {
