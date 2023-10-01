@@ -35,7 +35,7 @@ func main() {
 	jumpStrength := float32(-20.0)
 	ratioArrondiRec := float32(0.5)
 	segmentRec := int32(0)
-
+	toucheSaut := rl.KeySpace //Initialise la touche de saut
 	//animFrames := int32(0)
 	//p := &animFrames
 
@@ -65,8 +65,6 @@ func main() {
 			rl.DrawTexture(bgImage, 0, 0, rl.White)
 
 			if !rl.IsMusicStreamPlaying(bgMusic) {
-				//rl.UpdateMusicStream(bgMusic)
-				//rl.ResumeMusicStream(bgMusic)
 				rl.UpdateMusicStream(bgMusic)
 				rl.PlayMusicStream(bgMusic)
 			}
@@ -96,7 +94,6 @@ func main() {
 						case "Settings":
 							currentScreen = 3
 						}
-
 					}
 				}
 				rl.DrawRectangleRounded(button.Bounds, ratioArrondiRec, segmentRec, color)
@@ -105,9 +102,8 @@ func main() {
 			rl.EndDrawing()
 
 		case 2:
-
 			//Saut du personnage
-			if rl.IsKeyPressed(rl.KeySpace) && !isJumping {
+			if rl.IsKeyPressed(int32(toucheSaut)) && !isJumping {
 				isJumping = true
 				velocity = jumpStrength
 			}
@@ -121,10 +117,12 @@ func main() {
 					isJumping = false
 				}
 			}
+			stringToucheSaut := strconv.FormatInt(int64(toucheSaut), 10)
+			texteToucheSaut := "Press" + stringToucheSaut + " to jump"
 
 			rl.BeginDrawing()
 			rl.ClearBackground(rl.White)
-			rl.DrawText("PRESS SPACE to JUMP", 10, 0, 20, rl.Gray)
+			rl.DrawText(texteToucheSaut, 10, 0, 20, rl.Gray)
 			rl.DrawRectangleRec(player, rl.Red)
 
 			//Création du bouton back
@@ -147,7 +145,6 @@ func main() {
 						}
 					}
 				}
-
 				//Affichage du bouton
 				rl.DrawRectangleRounded(button.Bounds, ratioArrondiRec, segmentRec, color)
 				rl.DrawText(button.Text, int32(button.Bounds.X+button.Bounds.Width/2)-rl.MeasureText(button.Text, 20)/2, int32(button.Bounds.Y+10), 20, rl.Black)
@@ -168,6 +165,7 @@ func main() {
 			}{
 				{rl.NewRectangle(screenWidth/20, screenHeight/20, 150, 40), "Back"},
 				{rl.NewRectangle(screenWidth-(150+screenWidth/20), screenHeight-(40+screenHeight/20), 150, 40), "Quit"},
+				{rl.NewRectangle(screenWidth-(50+screenWidth/20), screenHeight-(200+screenHeight/20), 150, 40), "Change jump key"},
 			}
 
 			//Gestionnaire de FPS
@@ -194,8 +192,10 @@ func main() {
 							rl.CloseAudioDevice()
 							rl.CloseWindow()
 							return
+						case "Change jump key":
+							//Marche pas encore
+							toucheSaut = int(rl.GetKeyPressed())
 						}
-
 					}
 				}
 				rl.DrawRectangleRounded(button.Bounds, ratioArrondiRec, segmentRec, color)
@@ -203,7 +203,6 @@ func main() {
 			}
 			rl.EndDrawing()
 		}
-
 	}
 
 	rl.UnloadTexture(bgImage)
