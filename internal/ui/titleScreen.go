@@ -8,8 +8,9 @@ const (
 	screenWidth  = 1024
 	screenHeight = 600
 )
-
+ 
 func TitleScreen() {
+	var currentScreen = 1
 	rl.InitWindow(screenWidth, screenHeight, "ABDEL RUN!!!")
 	rl.SetTargetFPS(60)
 
@@ -43,25 +44,25 @@ func TitleScreen() {
 			if rl.CheckCollisionPointRec(rl.GetMousePosition(), button.Bounds) {
 				color = rl.DarkGray
 				if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
-					if button.Text == "Quit" {
-						rl.EndDrawing()
-						rl.UnloadMusicStream(bgMusic) // Libérer la musique de la mémoire
-						rl.CloseAudioDevice()         // Fermer le périphérique audio
+					switch button.Text {
+					case "Quit":
+						rl.UnloadMusicStream(bgMusic)
+						rl.CloseAudioDevice()
 						rl.CloseWindow()
 						return
+					case "Play":
+						rl.UnloadMusicStream(bgMusic)
+						rl.CloseAudioDevice()
+						currentScreen += 1
+					case "Settings":
+						currentScreen += 2
 					}
-					// Gérer les autres boutons ici
+
 				}
 			}
 			rl.DrawRectangleRec(button.Bounds, color)
 			rl.DrawText(button.Text, int32(button.Bounds.X+button.Bounds.Width/2)-rl.MeasureText(button.Text, 20)/2, int32(button.Bounds.Y+10), 20, rl.Black)
 		}
-
 		rl.EndDrawing()
-	}
-
-	rl.UnloadMusicStream(bgMusic) // Libérer la musique de la mémoire
-	rl.UnloadTexture(bgImage)     // N'oubliez pas de libérer l'image de la mémoire également
-	rl.CloseAudioDevice()         // Fermer le périphérique audio
-	rl.CloseWindow()
+}
 }
