@@ -22,9 +22,16 @@ func main() {
 	frameCounter := 0
 	currentScreen := 0
 
-	player := rl.Rectangle{
+	player1 := rl.Rectangle{
 		X:      screenWidth / 8,
 		Y:      screenHeight - 50.0,
+		Width:  50,
+		Height: 50,
+	}
+
+	player2 := rl.Rectangle{
+		X:      screenWidth / 8,
+		Y:      screenHeight - 150,
 		Width:  50,
 		Height: 50,
 	}
@@ -110,10 +117,10 @@ func main() {
 
 			//Retombée du personnage
 			if isJumping {
-				player.Y += velocity
+				player1.Y += velocity
 				velocity += gravity
-				if player.Y > screenHeight-player.Height {
-					player.Y = screenHeight - player.Height
+				if player1.Y > screenHeight-player1.Height {
+					player1.Y = screenHeight - player1.Height
 					isJumping = false
 				}
 			}
@@ -123,7 +130,14 @@ func main() {
 			rl.BeginDrawing()
 			rl.ClearBackground(rl.White)
 			rl.DrawText(texteToucheSaut, 10, 0, 20, rl.Gray)
-			rl.DrawRectangleRec(player, rl.Red)
+			rl.DrawRectangleRec(player1, rl.Red)
+			rl.DrawRectangleRec(player2, rl.Blue)
+
+			collision := rl.CheckCollisionRecs(player1, player2)
+
+			if collision {
+				rl.DrawText("COLLISION!", 600, 250, 20, rl.Red)
+			}
 
 			//Création du bouton back
 			buttons := []struct {
