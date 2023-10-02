@@ -165,13 +165,13 @@ func main() {
 			}{
 				{rl.NewRectangle(screenWidth/20, screenHeight/20, 150, 40), "Back"},
 				{rl.NewRectangle(screenWidth-(150+screenWidth/20), screenHeight-(40+screenHeight/20), 150, 40), "Quit"},
-				{rl.NewRectangle(screenWidth-(50+screenWidth/20), screenHeight-(200+screenHeight/20), 150, 40), "Change jump key"},
+				{rl.NewRectangle(screenWidth-220, screenHeight-360, 175, 40), "Change jump key"},
 			}
 
 			//Gestionnaire de FPS
 			stringFPS := strconv.FormatInt(int64(fps), 10)
-			rl.DrawText(stringFPS, screenWidth/2-100, screenHeight-50, 50, rl.Black)
-			recSelectFPS := rl.NewRectangle(300, 250, 105, 20)
+			rl.DrawText(stringFPS, screenWidth/2-150, screenHeight-420, 50, rl.Black)
+			recSelectFPS := rl.NewRectangle(200, 230, 150, 30)
 			fps = int32(rg.SliderBar(recSelectFPS, "fps", "", float32(fps), 30, 144))
 			rl.SetTargetFPS(fps)
 
