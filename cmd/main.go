@@ -3,6 +3,7 @@ package main
 import (
 	"strconv"
 
+	ui "github.com/LeYapson/Abdel_Run/internal/ui"
 	rg "github.com/gen2brain/raylib-go/raygui"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
@@ -58,14 +59,8 @@ func main() {
 
 		switch currentScreen {
 		case 0:
-			rl.BeginDrawing()
-			rl.DrawTexture(bgLogo, 0, 0, rl.White)
-			rl.EndDrawing()
-			frameCounter++
-			if frameCounter > 120 {
-				currentScreen++
-				rl.PlayMusicStream(bgMusic)
-			}
+
+			currentScreen, frameCounter = ui.LogoScreen(currentScreen, frameCounter, bgLogo, bgMusic)
 
 		case 1:
 			rl.BeginDrawing()
