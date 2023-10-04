@@ -46,9 +46,7 @@ func Settings(currentScreen int, screenWidth float32, screenHeight float32, fps 
 				case "Back":
 					currentScreen = 1
 				case "Quit":
-					rl.UnloadMusicStream(bgMusic)
-					rl.CloseAudioDevice()
-					rl.CloseWindow()
+					currentScreen = 4
 				case "Change jump key":
 
 					// Afficher un message demandant d'appuyer sur une touche
