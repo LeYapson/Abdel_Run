@@ -40,9 +40,7 @@ func TitleScreen(currentScreen int, bgImage rl.Texture2D, bgMusic rl.Music) int 
 				case "Settings":
 					currentScreen = 3
 				case "Quit":
-					rl.UnloadMusicStream(bgMusic)
-					rl.CloseAudioDevice()
-					rl.CloseWindow()
+					currentScreen = 4
 					//return
 				}
 			}
