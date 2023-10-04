@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"strconv"
 
 	ui "github.com/LeYapson/Abdel_Run/internal/ui"
@@ -15,7 +14,6 @@ const (
 )
 
 var fps = 60
-var currentScreen = 0
 
 func main() {
 	rl.InitWindow(screenWidth, screenHeight, "ABDEL RUN!!!")
@@ -73,12 +71,10 @@ func main() {
 			if rl.IsKeyPressed(int32(toucheSaut)) && !isJumping {
 				isJumping = true
 				velocity = jumpStrength
-				//fmt.Println(velocity)
 			}
 
 			//Retombée du personnage
 			if isJumping {
-				//fmt.Println(velocity)
 				//frate := float32(velocity * (float32(fps) * rl.GetFrameTime()))
 				player1.Y += velocity
 				velocity += gravity
@@ -90,7 +86,7 @@ func main() {
 			stringToucheSaut := strconv.FormatInt(int64(toucheSaut), 10)
 			texteToucheSaut := "Press" + stringToucheSaut + " to jump"
 
-			fmt.Println(rl.GetFrameTime())
+			//fmt.Println(rl.GetFrameTime())
 
 			rl.BeginDrawing()
 			rl.ClearBackground(rl.White)
@@ -188,6 +184,10 @@ func main() {
 				rl.DrawText(button.Text, int32(button.Bounds.X+button.Bounds.Width/2)-rl.MeasureText(button.Text, 20)/2, int32(button.Bounds.Y+10), 20, rl.Black)
 			}
 			rl.EndDrawing()
+		case 4:
+			rl.UnloadMusicStream(bgMusic)
+			rl.CloseAudioDevice()
+			rl.CloseWindow()
 		}
 	}
 	rl.UnloadTexture(bgImage)
