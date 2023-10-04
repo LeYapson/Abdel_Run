@@ -4,7 +4,7 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
-func LogoScreen(frameCounter int, currentScreen int, bgMusic rl.Music, bgLogo rl.Texture2D) (int, int) {
+func LogoScreen(currentScreen int, frameCounter int, bgLogo rl.Texture2D, bgMusic rl.Music) (int, int) {
 	rl.BeginDrawing()
 	rl.DrawTexture(bgLogo, 0, 0, rl.White)
 	rl.EndDrawing()
@@ -13,6 +13,5 @@ func LogoScreen(frameCounter int, currentScreen int, bgMusic rl.Music, bgLogo rl
 		currentScreen++
 		rl.PlayMusicStream(bgMusic)
 	}
-	return frameCounter, currentScreen
-
+	return currentScreen, frameCounter
 }

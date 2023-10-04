@@ -60,7 +60,7 @@ func main() {
 		platformX := float32(rl.GetRandomValue(0, int32(screenWidth)-400))
 		platformY := lastPlatformHeight - float32(rl.GetRandomValue(100, 150)) // espace entre 100 et 150
 
-		platforms = append(platforms, Platform{Rect:  rl.NewRectangle(platformX, platformY, platformWidth, platformHeight),Color: rl.Blue,})
+		platforms = append(platforms, Platform{Rect: rl.NewRectangle(platformX, platformY, platformWidth, platformHeight), Color: rl.Blue})
 
 		// Ajouter un obstacle sur la plateforme
 		obstacleWidth := float32(40)
@@ -68,7 +68,7 @@ func main() {
 		obstacleX := platformX + float32(rl.GetRandomValue(10, int32(platformWidth)-50))
 		obstacleY := platformY - obstacleHeight
 
-		obstacles = append(obstacles, Obstacle{Rect:  rl.NewRectangle(obstacleX, obstacleY, obstacleWidth, obstacleHeight),Color: rl.Red})
+		obstacles = append(obstacles, Obstacle{Rect: rl.NewRectangle(obstacleX, obstacleY, obstacleWidth, obstacleHeight), Color: rl.Red})
 
 		lastPlatformHeight = platformY
 	}
@@ -142,12 +142,12 @@ func main() {
 			}
 
 			// Dessinez les plateformes et les obstacles
-		for _, p := range platforms {
-			rl.DrawRectangleRec(p.Rect, p.Color)
-		}
-		for _, o := range obstacles {
-			rl.DrawRectangleRec(o.Rect, o.Color)
-		}
+			for _, p := range platforms {
+				rl.DrawRectangleRec(p.Rect, p.Color)
+			}
+			for _, o := range obstacles {
+				rl.DrawRectangleRec(o.Rect, o.Color)
+			}
 
 			rl.BeginDrawing()
 			rl.ClearBackground(rl.White)

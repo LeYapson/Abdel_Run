@@ -3,7 +3,7 @@ package main
 import (
 	"strconv"
 
-	lgs "github.com/LeYapson/Abdel_Run/internal/ui"
+	ui "github.com/LeYapson/Abdel_Run/internal/ui"
 	rg "github.com/gen2brain/raylib-go/raygui"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
@@ -22,9 +22,33 @@ func main() {
 	rl.InitAudioDevice() // Initialise le module audio
 
 	frameCounter := 0
+	currentScreen := 0
+
+	player1 := rl.Rectangle{
+		X:      screenWidth / 8,
+		Y:      screenHeight - 50.0,
+		Width:  50,
+		Height: 50,
+	}
+
+	player2 := rl.Rectangle{
+		X:      screenWidth / 8,
+		Y:      screenHeight - 150,
+		Width:  50,
+		Height: 50,
+	}
+
+	isJumping := false
+	velocity := float32(0.0)
+	gravity := float32(1.0)
+	jumpStrength := float32(-20.0)
 
 	ratioArrondiRec := float32(0.5)
 	segmentRec := int32(0)
+
+	toucheSaut := rl.KeySpace //Initialise la touche de saut
+	//animFrames := int32(0)
+	//p := &animFrames
 
 	// Charger l'image de fond et la musique une seule fois
 	bgLogo := rl.LoadTexture("../assets/images/logo.jpg")
@@ -38,9 +62,11 @@ func main() {
 
 		switch currentScreen {
 		case 0:
-			frameCounter, currentScreen = lgs.LogoScreen(frameCounter, currentScreen, bgMusic, bgLogo)
+			currentScreen, frameCounter = ui.LogoScreen(currentScreen, frameCounter, bgLogo, bgMusic)
 		case 1:
-			currentScreen = lgs.TitleScreen(currentScreen, screenWidth, screenHeight, bgMusic, bgImage)
+
+			currentScreen = ui.TitleScreen(currentScreen, bgImage, bgMusic)
+
 		case 2:
 			currentScreen = lgs.Gameplay(currentScreen, screenWidth, screenHeight, fps)
 		case 3:
