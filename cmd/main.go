@@ -53,11 +53,13 @@ func main() {
 	bgLogo := rl.LoadTexture("../assets/images/logo.jpg")
 	bgImage := rl.LoadTexture("../assets/images/TitleScreen.jpg")
 	bgMusic := rl.LoadMusicStream("../assets/sounds/AbdelRunSong.ogg")
+	playMusic := rl.LoadMusicStream("../assets/sounds/playSong.ogg")
 	bgSettings := rl.LoadTexture("../assets/images/Settings.png")
 	//gifAbdel := rl.LoadImageAnim("../assets/abdel_run.gif", p)
 
 	for !rl.WindowShouldClose() {
 		rl.UpdateMusicStream(bgMusic)
+		rl.UpdateMusicStream(playMusic)
 
 		switch currentScreen {
 		case 0:
@@ -67,6 +69,10 @@ func main() {
 			currentScreen = ui.TitleScreen(currentScreen, bgImage, bgMusic)
 
 		case 2:
+			if !rl.IsMusicStreamPlaying(playMusic) {
+				rl.UpdateMusicStream(playMusic)
+				rl.PlayMusicStream(playMusic)
+			}
 			collision := rl.CheckCollisionRecs(player1, player2)
 
 			if collision {
