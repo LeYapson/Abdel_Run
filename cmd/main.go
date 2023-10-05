@@ -3,6 +3,7 @@ package main
 import (
 	"strconv"
 
+	ui "github.com/LeYapson/Abdel_Run/internal/ui"
 	rg "github.com/gen2brain/raylib-go/raygui"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
@@ -12,19 +13,26 @@ const (
 	screenHeight = 600
 )
 
-var fps = int32(60)
+var fps = 60
 
 func main() {
 	rl.InitWindow(screenWidth, screenHeight, "ABDEL RUN!!!")
-	rl.SetTargetFPS(fps)
+	rl.SetTargetFPS(int32(fps))
 	rl.InitAudioDevice() // Initialise le module audio
 
 	frameCounter := 0
 	currentScreen := 0
 
-	player := rl.Rectangle{
+	player1 := rl.Rectangle{
 		X:      screenWidth / 8,
 		Y:      screenHeight - 50.0,
+		Width:  50,
+		Height: 50,
+	}
+
+	player2 := rl.Rectangle{
+		X:      screenWidth / 8,
+		Y:      screenHeight - 150,
 		Width:  50,
 		Height: 50,
 	}
@@ -33,8 +41,10 @@ func main() {
 	velocity := float32(0.0)
 	gravity := float32(1.0)
 	jumpStrength := float32(-20.0)
+
 	ratioArrondiRec := float32(0.5)
 	segmentRec := int32(0)
+
 	toucheSaut := rl.KeySpace //Initialise la touche de saut
 	//animFrames := int32(0)
 	//p := &animFrames
@@ -51,55 +61,10 @@ func main() {
 
 		switch currentScreen {
 		case 0:
-			rl.BeginDrawing()
-			rl.DrawTexture(bgLogo, 0, 0, rl.White)
-			rl.EndDrawing()
-			frameCounter++
-			if frameCounter > 120 {
-				currentScreen++
-				rl.PlayMusicStream(bgMusic)
-			}
-
+			currentScreen, frameCounter = ui.LogoScreen(currentScreen, frameCounter, bgLogo, bgMusic)
 		case 1:
-			rl.BeginDrawing()
-			rl.DrawTexture(bgImage, 0, 0, rl.White)
 
-			if !rl.IsMusicStreamPlaying(bgMusic) {
-				rl.UpdateMusicStream(bgMusic)
-				rl.PlayMusicStream(bgMusic)
-			}
-			buttons := []struct {
-				Bounds rl.Rectangle
-				Text   string
-			}{
-				{rl.NewRectangle(screenWidth-325, screenHeight/2-40, 150, 40), "Play"},
-				{rl.NewRectangle(screenWidth-325, screenHeight/2+10, 150, 40), "Settings"},
-				{rl.NewRectangle(screenWidth-325, screenHeight/2+60, 150, 40), "Quit"},
-			}
-
-			for _, button := range buttons {
-				color := rl.Yellow
-				if rl.CheckCollisionPointRec(rl.GetMousePosition(), button.Bounds) {
-					color = rl.DarkGray
-					if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
-						switch button.Text {
-						case "Quit":
-							rl.UnloadMusicStream(bgMusic)
-							rl.CloseAudioDevice()
-							rl.CloseWindow()
-							return
-						case "Play":
-							rl.StopMusicStream(bgMusic)
-							currentScreen = 2
-						case "Settings":
-							currentScreen = 3
-						}
-					}
-				}
-				rl.DrawRectangleRounded(button.Bounds, ratioArrondiRec, segmentRec, color)
-				rl.DrawText(button.Text, int32(button.Bounds.X+button.Bounds.Width/2)-rl.MeasureText(button.Text, 20)/2, int32(button.Bounds.Y+10), 20, rl.Black)
-			}
-			rl.EndDrawing()
+			currentScreen = ui.TitleScreen(currentScreen, bgImage, bgMusic)
 
 		case 2:
 			//Saut du personnage
@@ -110,20 +75,30 @@ func main() {
 
 			//Retombée du personnage
 			if isJumping {
-				player.Y += velocity
+				//frate := float32(velocity * (float32(fps) * rl.GetFrameTime()))
+				player1.Y += velocity
 				velocity += gravity
-				if player.Y > screenHeight-player.Height {
-					player.Y = screenHeight - player.Height
+				if player1.Y > screenHeight-player1.Height {
+					player1.Y = screenHeight - player1.Height
 					isJumping = false
 				}
 			}
 			stringToucheSaut := strconv.FormatInt(int64(toucheSaut), 10)
 			texteToucheSaut := "Press" + stringToucheSaut + " to jump"
 
+			//fmt.Println(rl.GetFrameTime())
+
 			rl.BeginDrawing()
 			rl.ClearBackground(rl.White)
 			rl.DrawText(texteToucheSaut, 10, 0, 20, rl.Gray)
-			rl.DrawRectangleRec(player, rl.Red)
+			rl.DrawRectangleRec(player1, rl.Red)
+			rl.DrawRectangleRec(player2, rl.Blue)
+
+			collision := rl.CheckCollisionRecs(player1, player2)
+
+			if collision {
+				rl.DrawText("COLLISION!", 600, 250, 20, rl.Red)
+			}
 
 			//Création du bouton back
 			buttons := []struct {
@@ -152,6 +127,7 @@ func main() {
 
 			rl.EndDrawing()
 
+			//currentScreen = lgs.Gameplay(currentScreen, screenWidth, screenHeight, fps)
 		case 3:
 			rl.BeginDrawing()
 			rl.DrawTexture(bgSettings, 0, 0, rl.White)
@@ -165,15 +141,15 @@ func main() {
 			}{
 				{rl.NewRectangle(screenWidth/20, screenHeight/20, 150, 40), "Back"},
 				{rl.NewRectangle(screenWidth-(150+screenWidth/20), screenHeight-(40+screenHeight/20), 150, 40), "Quit"},
-				{rl.NewRectangle(screenWidth-(50+screenWidth/20), screenHeight-(200+screenHeight/20), 150, 40), "Change jump key"},
+				{rl.NewRectangle(screenWidth-220, screenHeight-360, 175, 40), "Change jump key"},
 			}
 
 			//Gestionnaire de FPS
 			stringFPS := strconv.FormatInt(int64(fps), 10)
-			rl.DrawText(stringFPS, screenWidth/2-100, screenHeight-50, 50, rl.Black)
-			recSelectFPS := rl.NewRectangle(300, 250, 105, 20)
-			fps = int32(rg.SliderBar(recSelectFPS, "fps", "", float32(fps), 30, 144))
-			rl.SetTargetFPS(fps)
+			rl.DrawText(stringFPS, screenWidth/2-150, screenHeight-420, 50, rl.Black)
+			recSelectFPS := rl.NewRectangle(200, 230, 150, 30)
+			fps = int(rg.SliderBar(recSelectFPS, "fps", "", float32(fps), 30, 144))
+			rl.SetTargetFPS(int32(fps))
 
 			//Affiche les FPS
 			rl.DrawFPS(0, 0)
@@ -193,8 +169,14 @@ func main() {
 							rl.CloseWindow()
 							return
 						case "Change jump key":
-							//Marche pas encore
-							toucheSaut = int(rl.GetKeyPressed())
+
+							// Afficher un message demandant d'appuyer sur une touche
+							rl.DrawText("Appuyer sur une touche", 10, 10, 50, rl.Black)
+
+							// Attendre qu'une touche soit pressée
+							if rl.IsKeyPressed(rl.KeyZ) {
+								//toucheSaut = rl.KeyZ
+							}
 						}
 					}
 				}
@@ -202,9 +184,12 @@ func main() {
 				rl.DrawText(button.Text, int32(button.Bounds.X+button.Bounds.Width/2)-rl.MeasureText(button.Text, 20)/2, int32(button.Bounds.Y+10), 20, rl.Black)
 			}
 			rl.EndDrawing()
+		case 4:
+			rl.UnloadMusicStream(bgMusic)
+			rl.CloseAudioDevice()
+			rl.CloseWindow()
 		}
 	}
-
 	rl.UnloadTexture(bgImage)
 	rl.UnloadMusicStream(bgMusic)
 	rl.CloseAudioDevice()
