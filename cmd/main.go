@@ -67,6 +67,11 @@ func main() {
 			currentScreen = ui.TitleScreen(currentScreen, bgImage, bgMusic)
 
 		case 2:
+			collision := rl.CheckCollisionRecs(player1, player2)
+
+			if collision {
+				rl.DrawText("COLLISION!", 600, 250, 20, rl.Red)
+			}
 			//Saut du personnage
 			if rl.IsKeyPressed(int32(toucheSaut)) && !isJumping {
 				isJumping = true
@@ -81,6 +86,9 @@ func main() {
 				if player1.Y > screenHeight-player1.Height {
 					player1.Y = screenHeight - player1.Height
 					isJumping = false
+					// } else if (collision){
+					// 	player1.Y =
+					// }
 				}
 			}
 			stringToucheSaut := strconv.FormatInt(int64(toucheSaut), 10)
@@ -93,12 +101,6 @@ func main() {
 			rl.DrawText(texteToucheSaut, 10, 0, 20, rl.Gray)
 			rl.DrawRectangleRec(player1, rl.Red)
 			rl.DrawRectangleRec(player2, rl.Blue)
-
-			collision := rl.CheckCollisionRecs(player1, player2)
-
-			if collision {
-				rl.DrawText("COLLISION!", 600, 250, 20, rl.Red)
-			}
 
 			//Création du bouton back
 			buttons := []struct {
