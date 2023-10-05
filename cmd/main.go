@@ -35,7 +35,7 @@ func main() {
 	frameCounter := 0
 	currentScreen := 0
 
-	var player = newPlayer()
+	player := newPlayer()
 
 	//personne := models.NewPerson()
 
@@ -81,6 +81,10 @@ func main() {
 				rl.UpdateMusicStream(playMusic)
 				rl.PlayMusicStream(playMusic)
 			}
+
+			stringToucheSaut := strconv.FormatInt(int64(toucheSaut), 10)
+			texteToucheSaut := "Press" + stringToucheSaut + " to jump"
+
 			collision := rl.CheckCollisionRecs(player.hitbox, player2)
 
 			if collision {
@@ -95,20 +99,37 @@ func main() {
 			//Retombée du personnage
 			if isJumping {
 				//frate := float32(velocity * (float32(fps) * rl.GetFrameTime()))
+				if collision && player.hitbox.Y-player.hitbox.Y < player2.Y-player.hitbox.Height {
+					velocity = player2.Height / 2
+					player.hitbox.Y += velocity
+					velocity = 1.0
+				}
+				// if player.hitbox.Y >= player2.Y-player2.Height && player.hitbox.X+50 > player2.X && !collision {
+				// 	velocity = 1.0
+				// }
 				player.hitbox.Y += velocity
 				velocity += gravity
+				fmt.Println(player.hitbox.Y)
+
 				if player.hitbox.Y > screenHeight-player.hitbox.Height {
 					player.hitbox.Y = screenHeight - player.hitbox.Height
 					isJumping = false
-					// } else if (collision){
-					// 	player1.Y =
-					// }
 				}
 			}
-			stringToucheSaut := strconv.FormatInt(int64(toucheSaut), 10)
-			texteToucheSaut := "Press" + stringToucheSaut + " to jump"
 
-			//fmt.Println(rl.GetFrameTime())
+			if player.hitbox.Y <= player2.Y && collision {
+				player.hitbox.Y = player2.Y - player2.Height
+				isJumping = false
+			}
+
+			deplacementPlayer2 := float32(2.5)
+			if collision {
+				deplacementPlayer2 = 0
+			}
+			player2.X += deplacementPlayer2
+			if player2.X >= float32(rl.GetScreenWidth()-700) {
+				player2.X = 0
+			}
 
 			rl.BeginDrawing()
 			rl.ClearBackground(rl.White)
@@ -201,7 +222,7 @@ func main() {
 			return
 		case 5:
 			rl.ClearBackground(rl.Green)
-			rl.DrawText("Appuyer sur une touche", 10, 10, 50, rl.Black)
+			rl.DrawText("Press a key to change jump key", 100, 100, 50, rl.Black)
 
 			key := rl.GetKeyPressed()
 			fmt.Println(key)
