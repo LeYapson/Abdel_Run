@@ -68,9 +68,13 @@ func main() {
 	// Charger l'image de fond et la musique une seule fois
 	bgLogo := rl.LoadTexture("../assets/images/logo.jpg")
 	bgImage := rl.LoadTexture("../assets/images/TitleScreen.jpg")
+	bgSettings := rl.LoadTexture("../assets/images/Settings.png")
+	bgMapKey := rl.LoadTexture("../assets/images/bgMapKey.jpg")
+	bgPlay := rl.LoadTexture("../assets/images/bgPlay.png")
+	bgtoucheW := rl.LoadTexture("../assets/images/bgtoucheW.jpg")
 	bgMusic := rl.LoadMusicStream("../assets/sounds/AbdelRunSong.ogg")
 	playMusic := rl.LoadMusicStream("../assets/sounds/playSong.ogg")
-	bgSettings := rl.LoadTexture("../assets/images/Settings.png")
+	playW := rl.LoadMusicStream("../assets/sounds/toucheW.ogg")
 
 	for !rl.WindowShouldClose() {
 		rl.UpdateMusicStream(bgMusic)
@@ -82,9 +86,23 @@ func main() {
 		case 1:
 			currentScreen = ui.TitleScreen(currentScreen, ratioArrondiRec, segmentRec, bgImage, bgMusic)
 		case 2:
+
 			if !rl.IsMusicStreamPlaying(playMusic) {
 				rl.UpdateMusicStream(playMusic)
 				rl.PlayMusicStream(playMusic)
+			}
+			if rl.IsKeyDown(90) {
+				rl.SetTargetFPS(144)
+				rl.BeginDrawing()
+				rl.DrawTexture(bgtoucheW, 0, 0, rl.White)
+				rl.StopMusicStream(playMusic)
+				rl.UpdateMusicStream(playW)
+				rl.PlayMusicStream(playW)
+
+			} else {
+				rl.SetTargetFPS(int32(fps))
+				rl.BeginDrawing()
+				rl.DrawTexture(bgPlay, 0, 0, rl.White)
 			}
 
 			stringToucheSaut := strconv.FormatInt(int64(toucheSaut), 10)
@@ -146,8 +164,6 @@ func main() {
 
 			// }
 
-			rl.BeginDrawing()
-			rl.ClearBackground(rl.White)
 			rl.DrawText(texteToucheSaut, 10, 0, 20, rl.Gray)
 			rl.DrawRectangleRec(player1.hitbox, rl.Red)
 			rl.DrawRectangleRec(platforms[0].hitbox, rl.Green)
@@ -236,6 +252,8 @@ func main() {
 			rl.CloseWindow()
 			return
 		case 5:
+			rl.BeginDrawing()
+			rl.DrawTexture(bgMapKey, 0, 0, rl.White)
 			currentScreen, toucheSaut = ui.KeybindingScreen(currentScreen, ratioArrondiRec, segmentRec, bgLogo, bgMusic)
 		}
 	}
