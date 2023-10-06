@@ -35,8 +35,8 @@ func newPlatform(hitbox rl.Rectangle) *platform {
 	return &p
 }
 
-func collision(rec1 rl.Rectangle, rec2 rl.Rectangle) bool {
-	return rl.CheckCollisionRecs(rec1, rec2)
+func collision(player rl.Rectangle, platform rl.Rectangle) bool {
+	return rl.CheckCollisionRecs(player, platform)
 }
 
 var (
@@ -48,7 +48,7 @@ var (
 
 	player1 = newPlayer()
 
-	platform1 = newPlatform(rl.NewRectangle(screenWidth/8, screenHeight-150, 150, 50))
+	platform1 = newPlatform(rl.NewRectangle(screenWidth, screenHeight-150, 150, 50))
 
 	isJumping    = false
 	velocity     = float32(0.0)
@@ -126,13 +126,13 @@ func main() {
 				isJumping = false
 			}
 
-			deplacementPlatform := float32(2.5)
+			deplacementPlatform := float32(10)
 			if collision(player1.hitbox, platform1.hitbox) {
 				deplacementPlatform = 0
 			}
-			platform1.hitbox.X += deplacementPlatform
-			if platform1.hitbox.X >= float32(rl.GetScreenWidth()-700) {
-				platform1.hitbox.X = 0
+			platform1.hitbox.X -= deplacementPlatform
+			if platform1.hitbox.X <= 0-platform1.hitbox.Width {
+				platform1.hitbox.X = float32(rl.GetScreenWidth())
 			}
 
 			rl.BeginDrawing()
@@ -157,6 +157,8 @@ func main() {
 					if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
 						switch button.Text {
 						case "Back":
+							player1.hitbox.Y = screenHeight - 50.0
+							platform1.hitbox.X = screenWidth
 							rl.StopMusicStream(playMusic)
 							currentScreen = 1
 						}
