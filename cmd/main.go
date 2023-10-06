@@ -46,9 +46,9 @@ var (
 	frameCounter  = 0
 	currentScreen = 0
 
-	player1 = newPlayer()
-
-	platform1 = newPlatform(rl.NewRectangle(screenWidth, screenHeight-150, 150, 50))
+	player1   = newPlayer()
+	platform1 = newPlatform(rl.NewRectangle(screenWidth/2, screenHeight-150, 150, 50))
+	platforms = []*platform{platform1}
 
 	isJumping    = false
 	velocity     = float32(0.0)
@@ -125,14 +125,17 @@ func main() {
 				player1.hitbox.Y = platform1.hitbox.Y - platform1.hitbox.Height
 				isJumping = false
 			}
-
 			deplacementPlatform := float32(10)
-			if collision(player1.hitbox, platform1.hitbox) {
-				deplacementPlatform = 0
+
+			for i := 0; i < len(platforms)-1; i++ {
+				if collision(player1.hitbox, platforms[i].hitbox) {
+					deplacementPlatform = 0
+				}
 			}
-			platform1.hitbox.X -= deplacementPlatform
-			if platform1.hitbox.X <= 0-platform1.hitbox.Width {
-				platform1.hitbox.X = float32(rl.GetScreenWidth())
+
+			platforms[0].hitbox.X -= deplacementPlatform
+			if platforms[0].hitbox.X <= 0-platforms[0].hitbox.Width {
+				platforms[0].hitbox.X = float32(rl.GetScreenWidth())
 			}
 
 			rl.BeginDrawing()
