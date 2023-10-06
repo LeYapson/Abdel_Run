@@ -11,8 +11,29 @@ import (
 
 // Initialise les constantes de la taille de la fenêtre
 const (
-	screenWidth  = 1024
-	screenHeight = 600
+	screenWidth     = 1024
+	screenHeight    = 600
+	ratioArrondiRec = float32(0.5)
+	segmentRec      = int32(0)
+)
+
+var (
+	fps        = 60
+	toucheSaut = int32(rl.KeySpace) //Initialise la touche de saut
+
+	frameCounter  = 0
+	currentScreen = 0
+
+	player1   = newPlayer()
+	platform0 = newPlatform(rl.NewRectangle(screenWidth, screenHeight-150, 150, 50))
+	platform1 = newPlatform(rl.NewRectangle(screenWidth+300, screenHeight-250, 150, 50))
+	//platform2 = newPlatform(rl.NewRectangle(screenWidth/2, screenHeight-150, 150, 50))
+	platforms = [2]*platform{platform0, platform1}
+
+	isJumping    = false
+	velocity     = float32(0.0)
+	gravity      = float32(1.0)
+	jumpStrength = float32(-20.0)
 )
 
 // Structure player avec sa hitbox et ses points de vie
@@ -39,26 +60,6 @@ func collision(player rl.Rectangle, platform rl.Rectangle) bool {
 	return rl.CheckCollisionRecs(player, platform)
 }
 
-var (
-	fps        = 60
-	toucheSaut = int32(rl.KeySpace) //Initialise la touche de saut
-
-	frameCounter  = 0
-	currentScreen = 0
-
-	player1   = newPlayer()
-	platform1 = newPlatform(rl.NewRectangle(screenWidth/2, screenHeight-150, 150, 50))
-	platforms = []*platform{platform1}
-
-	isJumping    = false
-	velocity     = float32(0.0)
-	gravity      = float32(1.0)
-	jumpStrength = float32(-20.0)
-
-	ratioArrondiRec = float32(0.5)
-	segmentRec      = int32(0)
-)
-
 func main() {
 	rl.InitWindow(screenWidth, screenHeight, "ABDEL RUN!!!")
 	rl.SetTargetFPS(int32(fps)) //Initialise le nombre d'images par seconde
@@ -79,7 +80,7 @@ func main() {
 		case 0:
 			currentScreen, frameCounter = ui.LogoScreen(currentScreen, frameCounter, bgLogo, bgMusic)
 		case 1:
-			currentScreen = ui.TitleScreen(currentScreen, bgImage, bgMusic)
+			currentScreen = ui.TitleScreen(currentScreen, ratioArrondiRec, segmentRec, bgImage, bgMusic)
 		case 2:
 			if !rl.IsMusicStreamPlaying(playMusic) {
 				rl.UpdateMusicStream(playMusic)
@@ -89,9 +90,7 @@ func main() {
 			stringToucheSaut := strconv.FormatInt(int64(toucheSaut), 10)
 			texteToucheSaut := "Press" + stringToucheSaut + " to jump"
 
-			//collision := rl.CheckCollisionRecs(player1.hitbox, platform1.hitbox)
-
-			if collision(player1.hitbox, platform1.hitbox) {
+			if collision(player1.hitbox, platforms[0].hitbox) {
 				rl.DrawText("COLLISION!", 600, 250, 20, rl.Red)
 			}
 			//Saut du personnage
@@ -103,46 +102,56 @@ func main() {
 			//Retombée du personnage
 			if isJumping {
 				//frate := float32(velocity * (float32(fps) * rl.GetFrameTime()))
-				if collision(player1.hitbox, platform1.hitbox) && player1.hitbox.Y-player1.hitbox.Y < platform1.hitbox.Y-player1.hitbox.Height {
-					velocity = platform1.hitbox.Height / 2
-					player1.hitbox.Y += velocity
-					velocity = 1.0
-				}
-				// if player.hitbox.Y >= player2.Y-player2.Height && player.hitbox.X+50 > player2.X && !collision {
-				// 	velocity = 1.0
-				// }
+
 				player1.hitbox.Y += velocity
 				velocity += gravity
 				fmt.Println(player1.hitbox.Y)
 
-				if player1.hitbox.Y > screenHeight-player1.hitbox.Height {
-					player1.hitbox.Y = screenHeight - player1.hitbox.Height
-					isJumping = false
+				for i := 0; i < len(platforms); i++ {
+					if collision(player1.hitbox, platforms[i].hitbox) && player1.hitbox.Y-player1.hitbox.Y < platforms[i].hitbox.Y-player1.hitbox.Height {
+						velocity = platforms[i].hitbox.Height / 2
+						player1.hitbox.Y += velocity
+						velocity = 1.0
+					}
+
+					if player1.hitbox.Y > screenHeight-player1.hitbox.Height {
+						player1.hitbox.Y = screenHeight - player1.hitbox.Height
+						isJumping = false
+					}
 				}
+				// if player.hitbox.Y >= player2.Y-player2.Height && player.hitbox.X+50 > player2.X && !collision {
+				// 	velocity = 1.0
+				// }
 			}
 
-			if player1.hitbox.Y <= platform1.hitbox.Y && collision(player1.hitbox, platform1.hitbox) {
-				player1.hitbox.Y = platform1.hitbox.Y - platform1.hitbox.Height
-				isJumping = false
-			}
 			deplacementPlatform := float32(10)
 
-			for i := 0; i < len(platforms)-1; i++ {
+			for i := 0; i < len(platforms); i++ {
 				if collision(player1.hitbox, platforms[i].hitbox) {
 					deplacementPlatform = 0
+
+				}
+
+				if player1.hitbox.Y <= platforms[i].hitbox.Y && collision(player1.hitbox, platforms[i].hitbox) {
+					player1.hitbox.Y = platforms[i].hitbox.Y - platforms[i].hitbox.Height
+					isJumping = false
+				}
+				platforms[i].hitbox.X -= deplacementPlatform
+				if platforms[i].hitbox.X <= 0-platforms[i].hitbox.Width {
+					platforms[i].hitbox.X = float32(rl.GetScreenWidth())
 				}
 			}
 
-			platforms[0].hitbox.X -= deplacementPlatform
-			if platforms[0].hitbox.X <= 0-platforms[0].hitbox.Width {
-				platforms[0].hitbox.X = float32(rl.GetScreenWidth())
-			}
+			// for i := 0; i < len(platforms); i++ {
+
+			// }
 
 			rl.BeginDrawing()
 			rl.ClearBackground(rl.White)
 			rl.DrawText(texteToucheSaut, 10, 0, 20, rl.Gray)
 			rl.DrawRectangleRec(player1.hitbox, rl.Red)
-			rl.DrawRectangleRec(platform1.hitbox, rl.Blue)
+			rl.DrawRectangleRec(platforms[0].hitbox, rl.Green)
+			rl.DrawRectangleRec(platforms[1].hitbox, rl.Blue)
 
 			//Création du bouton back
 			buttons := []struct {
@@ -227,42 +236,7 @@ func main() {
 			rl.CloseWindow()
 			return
 		case 5:
-			rl.ClearBackground(rl.Green)
-			rl.DrawText("Press a key to change jump key", 100, 100, 50, rl.Black)
-
-			key := rl.GetKeyPressed()
-			fmt.Println(key)
-			if key != 0 {
-				toucheSaut = key
-			}
-
-			rl.BeginDrawing()
-			rl.ClearBackground(rl.Green)
-
-			//Bouton back
-			buttons := []struct {
-				Bounds rl.Rectangle
-				Text   string
-			}{
-				{rl.NewRectangle(screenWidth/20, screenHeight/20, 150, 40), "Back"},
-			}
-
-			//Création et fonctionnalité des boutons Back et Quit
-			for _, button := range buttons {
-				color := rl.Yellow
-				if rl.CheckCollisionPointRec(rl.GetMousePosition(), button.Bounds) {
-					color = rl.DarkGray
-					if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
-						switch button.Text {
-						case "Back":
-							currentScreen = 3
-						}
-					}
-				}
-				rl.DrawRectangleRounded(button.Bounds, ratioArrondiRec, segmentRec, color)
-				rl.DrawText(button.Text, int32(button.Bounds.X+button.Bounds.Width/2)-rl.MeasureText(button.Text, 20)/2, int32(button.Bounds.Y+10), 20, rl.Black)
-			}
-			rl.EndDrawing()
+			currentScreen, toucheSaut = ui.KeybindingScreen(currentScreen, ratioArrondiRec, segmentRec, bgLogo, bgMusic)
 		}
 	}
 	rl.UnloadTexture(bgImage)
