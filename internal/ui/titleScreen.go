@@ -10,8 +10,6 @@ const (
 )
 
 func TitleScreen(currentScreen int, ratioArrondiRec float32, segmentRec int32, bgImage rl.Texture2D, bgMusic rl.Music) int {
-	// ratioArrondiRec := float32(0.5)
-	// segmentRec := int32(0)
 	rl.BeginDrawing()
 	rl.DrawTexture(bgImage, 0, 0, rl.White)
 
