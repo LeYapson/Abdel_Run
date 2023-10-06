@@ -38,8 +38,6 @@ var (
 	velocity     = float32(0.0)
 	gravity      = float32(1.0)
 	jumpStrength = float32(-20.0)
-
-	compteur = 0
 )
 
 // Structure player avec sa hitbox et ses points de vie
@@ -91,6 +89,7 @@ func main() {
 	bgGameOver := rl.LoadTexture("../assets/images/GameOver.jpg")
 	playMusic := rl.LoadMusicStream("../assets/sounds/playSong.ogg")
 	playW := rl.LoadMusicStream("../assets/sounds/toucheW.ogg")
+	gameoverMusic := rl.LoadMusicStream("../assets/sounds/gameoverMusic.ogg")
 
 	for !rl.WindowShouldClose() {
 		rl.UpdateMusicStream(bgMusic)
@@ -102,7 +101,6 @@ func main() {
 		case 1:
 			currentScreen = ui.TitleScreen(currentScreen, ratioArrondiRec, segmentRec, bgImage, bgMusic)
 		case 2:
-
 			if !rl.IsMusicStreamPlaying(playMusic) {
 				rl.UpdateMusicStream(playMusic)
 				rl.PlayMusicStream(playMusic)
@@ -188,6 +186,7 @@ func main() {
 			}
 
 			if player1.health == 0 {
+				rl.StopMusicStream(playMusic)
 				currentScreen = 6
 			}
 
@@ -291,7 +290,16 @@ func main() {
 			rl.DrawTexture(bgMapKey, 0, 0, rl.White)
 			currentScreen, toucheSaut = ui.KeybindingScreen(currentScreen, ratioArrondiRec, segmentRec, bgLogo, bgMusic)
 		case 6:
-			currentScreen = ui.GameoverScreen(currentScreen, ratioArrondiRec, segmentRec, bgGameOver, bgMusic)
+			player1 = newPlayer(rl.NewRectangle(screenWidth/8, screenHeight-50.0, 50, 50))
+
+			platform0 = newPlatform(rl.NewRectangle(screenWidth, screenHeight-150, 150, 50))
+			platform1 = newPlatform(rl.NewRectangle(screenWidth+200, screenHeight-250, 150, 50))
+			platform2 = newPlatform(rl.NewRectangle(screenWidth+400, screenHeight-300, 150, 50))
+			platforms = [3]*platform{platform0, platform1, platform2}
+
+			ennemi0 = newEnnemi(rl.NewRectangle(screenWidth, screenHeight-50, 30, 30))
+			ennemis = [1]*ennemi{ennemi0}
+			currentScreen = ui.GameoverScreen(currentScreen, ratioArrondiRec, segmentRec, bgGameOver, gameoverMusic)
 		}
 
 	}

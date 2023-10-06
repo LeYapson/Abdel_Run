@@ -9,20 +9,20 @@ const (
 	screenHeight = 600
 )
 
-func GameoverScreen(currentScreen int, ratioArrondiRec float32, segmentRec int32, bgImage rl.Texture2D, bgMusic rl.Music) int {
+func GameoverScreen(currentScreen int, ratioArrondiRec float32, segmentRec int32, bgImage rl.Texture2D, gameoverMusic rl.Music) int {
 	rl.BeginDrawing()
 	rl.DrawTexture(bgImage, 0, 0, rl.White)
 
-	if !rl.IsMusicStreamPlaying(bgMusic) {
-		rl.UpdateMusicStream(bgMusic)
-		rl.PlayMusicStream(bgMusic)
-	}
+	rl.UpdateMusicStream(gameoverMusic)
+	rl.PlayMusicStream(gameoverMusic)
+
 	buttons := []struct {
 		Bounds rl.Rectangle
 		Text   string
 	}{
-		{rl.NewRectangle(screenWidth-325, screenHeight/2-40, 150, 40), "Restart"},
-		{rl.NewRectangle(screenWidth-325, screenHeight/2+60, 150, 40), "Quit"},
+		{rl.NewRectangle(screenWidth/2-75, screenHeight/2-40, 150, 40), "Restart"},
+		{rl.NewRectangle(screenWidth/2-75, screenHeight/2+10, 150, 40), "Main menu"},
+		{rl.NewRectangle(screenWidth/2-75, screenHeight/2+60, 150, 40), "Quit"},
 	}
 
 	for _, button := range buttons {
@@ -32,8 +32,10 @@ func GameoverScreen(currentScreen int, ratioArrondiRec float32, segmentRec int32
 			if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
 				switch button.Text {
 				case "Restart":
-					rl.StopMusicStream(bgMusic)
+					rl.StopMusicStream(gameoverMusic)
 					currentScreen = 2
+				case "Main menu":
+					currentScreen = 1
 				case "Quit":
 					currentScreen = 4
 					//return
