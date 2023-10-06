@@ -24,16 +24,22 @@ var (
 	frameCounter  = 0
 	currentScreen = 0
 
-	player1   = newPlayer()
+	player1 = newPlayer(rl.NewRectangle(screenWidth/8, screenHeight-50.0, 50, 50))
+
 	platform0 = newPlatform(rl.NewRectangle(screenWidth, screenHeight-150, 150, 50))
-	platform1 = newPlatform(rl.NewRectangle(screenWidth+300, screenHeight-250, 150, 50))
-	//platform2 = newPlatform(rl.NewRectangle(screenWidth/2, screenHeight-150, 150, 50))
-	platforms = [2]*platform{platform0, platform1}
+	platform1 = newPlatform(rl.NewRectangle(screenWidth+200, screenHeight-250, 150, 50))
+	platform2 = newPlatform(rl.NewRectangle(screenWidth+400, screenHeight-300, 150, 50))
+	platforms = [3]*platform{platform0, platform1, platform2}
+
+	ennemi0 = newEnnemi(rl.NewRectangle(screenWidth, screenHeight-50, 30, 30))
+	ennemis = [1]*ennemi{ennemi0}
 
 	isJumping    = false
 	velocity     = float32(0.0)
 	gravity      = float32(1.0)
 	jumpStrength = float32(-20.0)
+
+	compteur = 0
 )
 
 // Structure player avec sa hitbox et ses points de vie
@@ -42,18 +48,27 @@ type player struct {
 	health int
 }
 
-type platform struct {
-	hitbox rl.Rectangle
+func newPlayer(hitbox rl.Rectangle) *player {
+	p := player{hitbox, 3}
+	return &p
 }
 
-func newPlayer() *player {
-	p := player{rl.NewRectangle(screenWidth/8, screenHeight-50.0, 50, 50), 3}
-	return &p
+type platform struct {
+	hitbox rl.Rectangle
 }
 
 func newPlatform(hitbox rl.Rectangle) *platform {
 	p := platform{hitbox}
 	return &p
+}
+
+type ennemi struct {
+	hitbox rl.Rectangle
+}
+
+func newEnnemi(hitbox rl.Rectangle) *ennemi {
+	e := ennemi{hitbox}
+	return &e
 }
 
 func collision(player rl.Rectangle, platform rl.Rectangle) bool {
@@ -73,6 +88,7 @@ func main() {
 	bgPlay := rl.LoadTexture("../assets/images/bgPlay.png")
 	bgtoucheW := rl.LoadTexture("../assets/images/bgtoucheW.jpg")
 	bgMusic := rl.LoadMusicStream("../assets/sounds/AbdelRunSong.ogg")
+	bgGameOver := rl.LoadTexture("../assets/images/GameOver.jpg")
 	playMusic := rl.LoadMusicStream("../assets/sounds/playSong.ogg")
 	playW := rl.LoadMusicStream("../assets/sounds/toucheW.ogg")
 
@@ -91,6 +107,7 @@ func main() {
 				rl.UpdateMusicStream(playMusic)
 				rl.PlayMusicStream(playMusic)
 			}
+
 			if rl.IsKeyDown(90) {
 				rl.SetTargetFPS(144)
 				rl.BeginDrawing()
@@ -120,7 +137,6 @@ func main() {
 			//Retombée du personnage
 			if isJumping {
 				//frate := float32(velocity * (float32(fps) * rl.GetFrameTime()))
-
 				player1.hitbox.Y += velocity
 				velocity += gravity
 				fmt.Println(player1.hitbox.Y)
@@ -142,33 +158,53 @@ func main() {
 				// }
 			}
 
-			deplacementPlatform := float32(10)
+			platformsEnnemisSpeed := float32(10)
 
+			//Gestion des déplacements des et collisions avec les plateformes
 			for i := 0; i < len(platforms); i++ {
 				if collision(player1.hitbox, platforms[i].hitbox) {
-					deplacementPlatform = 0
-
+					platformsEnnemisSpeed = 0
 				}
 
 				if player1.hitbox.Y <= platforms[i].hitbox.Y && collision(player1.hitbox, platforms[i].hitbox) {
 					player1.hitbox.Y = platforms[i].hitbox.Y - platforms[i].hitbox.Height
 					isJumping = false
 				}
-				platforms[i].hitbox.X -= deplacementPlatform
+				platforms[i].hitbox.X -= platformsEnnemisSpeed
 				if platforms[i].hitbox.X <= 0-platforms[i].hitbox.Width {
 					platforms[i].hitbox.X = float32(rl.GetScreenWidth())
 				}
 			}
 
-			// for i := 0; i < len(platforms); i++ {
+			//Gestions des déplacements et des collisions avec les ennemis
+			for i := 0; i < len(ennemis); i++ {
+				if collision(player1.hitbox, ennemis[i].hitbox) {
+					player1.health = 0
+				}
+				ennemis[i].hitbox.X -= platformsEnnemisSpeed
+				if ennemis[i].hitbox.X <= 0-ennemis[i].hitbox.Width {
+					ennemis[i].hitbox.X = float32(rl.GetScreenWidth())
+				}
+			}
 
-			// }
+			if player1.health == 0 {
+				currentScreen = 6
+			}
 
 			rl.DrawText(texteToucheSaut, 10, 0, 20, rl.Gray)
 			rl.DrawRectangleRec(player1.hitbox, rl.Red)
-			rl.DrawRectangleRec(platforms[0].hitbox, rl.Green)
-			rl.DrawRectangleRec(platforms[1].hitbox, rl.Blue)
 
+			//Dessiner toutes les plateformes
+			for i := 0; i < len(platforms); i++ {
+				rl.DrawRectangleRec(platforms[i].hitbox, rl.Green)
+			}
+
+			// //Dessiner tous les ennemis
+			// for i := 0; i < len(ennemis); i++ {
+			// 	rl.DrawRectangleRec(ennemis[i].hitbox, rl.Purple)
+			// }
+
+			rl.DrawRectangleRec(ennemis[0].hitbox, rl.Purple)
 			//Création du bouton back
 			buttons := []struct {
 				Bounds rl.Rectangle
@@ -176,7 +212,6 @@ func main() {
 			}{
 				{rl.NewRectangle(screenWidth/20, screenHeight/20, 150, 40), "Back"},
 			}
-
 			//Fonctionnalité du bouton
 			for _, button := range buttons {
 				color := rl.Yellow
@@ -255,7 +290,10 @@ func main() {
 			rl.BeginDrawing()
 			rl.DrawTexture(bgMapKey, 0, 0, rl.White)
 			currentScreen, toucheSaut = ui.KeybindingScreen(currentScreen, ratioArrondiRec, segmentRec, bgLogo, bgMusic)
+		case 6:
+			currentScreen = ui.GameoverScreen(currentScreen, ratioArrondiRec, segmentRec, bgGameOver, bgMusic)
 		}
+
 	}
 	rl.UnloadTexture(bgImage)
 	rl.UnloadMusicStream(bgMusic)

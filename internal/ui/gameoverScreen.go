@@ -4,7 +4,12 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
-func TitleScreen(currentScreen int, ratioArrondiRec float32, segmentRec int32, bgImage rl.Texture2D, bgMusic rl.Music) int {
+const (
+	screenWidth  = 1024
+	screenHeight = 600
+)
+
+func GameoverScreen(currentScreen int, ratioArrondiRec float32, segmentRec int32, bgImage rl.Texture2D, bgMusic rl.Music) int {
 	rl.BeginDrawing()
 	rl.DrawTexture(bgImage, 0, 0, rl.White)
 
@@ -16,8 +21,7 @@ func TitleScreen(currentScreen int, ratioArrondiRec float32, segmentRec int32, b
 		Bounds rl.Rectangle
 		Text   string
 	}{
-		{rl.NewRectangle(screenWidth-325, screenHeight/2-40, 150, 40), "Play"},
-		{rl.NewRectangle(screenWidth-325, screenHeight/2+10, 150, 40), "Settings"},
+		{rl.NewRectangle(screenWidth-325, screenHeight/2-40, 150, 40), "Restart"},
 		{rl.NewRectangle(screenWidth-325, screenHeight/2+60, 150, 40), "Quit"},
 	}
 
@@ -27,11 +31,9 @@ func TitleScreen(currentScreen int, ratioArrondiRec float32, segmentRec int32, b
 			color = rl.DarkGray
 			if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
 				switch button.Text {
-				case "Play":
+				case "Restart":
 					rl.StopMusicStream(bgMusic)
 					currentScreen = 2
-				case "Settings":
-					currentScreen = 3
 				case "Quit":
 					currentScreen = 4
 					//return
