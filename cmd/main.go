@@ -58,27 +58,27 @@ type player struct {
 	health int
 }
 
-func newPlayer(hitbox rl.Rectangle) *player {
-	p := player{hitbox, 1}
-	return &p
-}
-
 type platform struct {
 	hitbox rl.Rectangle
-}
-
-func newPlatform(hitbox rl.Rectangle) *platform {
-	p := platform{hitbox}
-	return &p
 }
 
 type ennemi struct {
 	hitbox rl.Rectangle
 }
 
+func newPlayer(hitbox rl.Rectangle) *player {
+	p := player{hitbox, 1}
+	return &p
+}
+
 func newEnnemi(hitbox rl.Rectangle) *ennemi {
 	e := ennemi{hitbox}
 	return &e
+}
+
+func newPlatform(hitbox rl.Rectangle) *platform {
+	p := platform{hitbox}
+	return &p
 }
 
 func collision(player rl.Rectangle, platform rl.Rectangle) bool {
@@ -90,7 +90,7 @@ func main() {
 	rl.SetTargetFPS(int32(fps)) //Initialise le nombre d'images par seconde
 	rl.InitAudioDevice()        // Initialise le module audio
 
-	// Charger l'image de fond et la musique une seule fois
+	// Charger les images et les musiques une seule fois
 	bgLogo := rl.LoadTexture("../assets/images/logo.jpg")
 	bgImage := rl.LoadTexture("../assets/images/TitleScreen.jpg")
 	bgSettings := rl.LoadTexture("../assets/images/Settings.png")
@@ -109,10 +109,13 @@ func main() {
 		rl.UpdateMusicStream(playMusic)
 
 		switch currentScreen {
+		//case 0 = LOADING GAME SCREEN
 		case 0:
 			currentScreen, frameCounter = ui.LogoScreen(currentScreen, frameCounter, bgLogo, bgMusic)
+		//case 1 = MAIN MENU SCREEN
 		case 1:
 			currentScreen = ui.TitleScreen(currentScreen, ratioArrondiRec, segmentRec, bgImage, bgMusic)
+		//case 2 = PLAY SCREEN
 		case 2:
 			if !rl.IsMusicStreamPlaying(playMusic) {
 				rl.UpdateMusicStream(playMusic)
@@ -140,7 +143,10 @@ func main() {
 			scoreStr := strconv.Itoa(score)
 
 			stringToucheSaut := strconv.FormatInt(int64(toucheSaut), 10)
-			texteToucheSaut := "Press" + stringToucheSaut + " to jump"
+			texteToucheSaut := "Press " + stringToucheSaut + " to jump"
+			textToucheW := "Press W for using the TIME POWER"
+			rl.DrawText(texteToucheSaut, 10, 0, 20, rl.Yellow)
+			rl.DrawText(textToucheW, 650, 0, 20, rl.Yellow)
 
 			//Saut du personnage
 			if rl.IsKeyPressed(int32(toucheSaut)) && !isJumping {
@@ -208,7 +214,6 @@ func main() {
 				currentScreen = 6
 			}
 
-			rl.DrawText(texteToucheSaut, 10, 0, 20, rl.Gray)
 			rl.DrawRectangleRec(player1.hitbox, rl.Blue)
 
 			//Dessiner toutes les plateformes
@@ -255,6 +260,7 @@ func main() {
 				rl.DrawText(deathCountStr, screenWidth-200, 100, 25, rl.White)
 			}
 			rl.EndDrawing()
+		//case 3 = SETTINGS SCREEN
 		case 3:
 			rl.BeginDrawing()
 			rl.DrawTexture(bgSettings, 0, 0, rl.White)
@@ -304,15 +310,19 @@ func main() {
 				rl.DrawText(button.Text, int32(button.Bounds.X+button.Bounds.Width/2)-rl.MeasureText(button.Text, 20)/2, int32(button.Bounds.Y+10), 20, rl.Black)
 			}
 			rl.EndDrawing()
+		//case 4 = QUIT THE GAME
 		case 4:
 			rl.UnloadMusicStream(bgMusic)
 			rl.CloseAudioDevice()
 			rl.CloseWindow()
 			return
+		//case 5 = Settings ---> key mapping SCREEN
 		case 5:
 			rl.BeginDrawing()
 			rl.DrawTexture(bgMapKey, 0, 0, rl.White)
 			currentScreen, toucheSaut = ui.KeybindingScreen(currentScreen, ratioArrondiRec, segmentRec, bgLogo, bgMusic)
+
+		//case 6 = GAME OVER SCREEN
 		case 6:
 			player1 = newPlayer(dimPlayer1)
 
