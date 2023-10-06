@@ -24,20 +24,26 @@ var (
 	frameCounter  = 0
 	currentScreen = 0
 
-	player1 = newPlayer(rl.NewRectangle(screenWidth/8, screenHeight-50.0, 50, 50))
+	dimPlayer1 = rl.NewRectangle(screenWidth/8, screenHeight-50.0, 50, 50)
+	player1    = newPlayer(dimPlayer1)
 
-	platform0 = newPlatform(rl.NewRectangle(screenWidth, screenHeight-150, 150, 50))
-	platform1 = newPlatform(rl.NewRectangle(screenWidth+200, screenHeight-250, 150, 50))
-	platform2 = newPlatform(rl.NewRectangle(screenWidth+400, screenHeight-300, 150, 50))
-	platforms = [3]*platform{platform0, platform1, platform2}
+	dimPlatform0 = rl.NewRectangle(screenWidth, screenHeight-150, 90, 50)
+	dimPlatform1 = rl.NewRectangle(screenWidth+200, screenHeight-250, 200, 50)
+	dimPlatform2 = rl.NewRectangle(screenWidth+450, screenHeight-300, 150, 50)
+	platform0    = newPlatform(dimPlatform0)
+	platform1    = newPlatform(dimPlatform1)
+	platform2    = newPlatform(dimPlatform2)
+	platforms    = [3]*platform{platform0, platform1, platform2}
 
-	ennemi0 = newEnnemi(rl.NewRectangle(screenWidth, screenHeight-50, 30, 30))
-	ennemis = [1]*ennemi{ennemi0}
+	dimEnnemi0 = rl.NewRectangle(screenWidth, screenHeight-50, 30, 30)
+	ennemi0    = newEnnemi(dimEnnemi0)
+	ennemis    = [1]*ennemi{ennemi0}
 
 	isJumping    = false
 	velocity     = float32(0.0)
 	gravity      = float32(1.0)
 	jumpStrength = float32(-20.0)
+	score        = 0
 )
 
 // Structure player avec sa hitbox et ses points de vie
@@ -101,6 +107,8 @@ func main() {
 		case 1:
 			currentScreen = ui.TitleScreen(currentScreen, ratioArrondiRec, segmentRec, bgImage, bgMusic)
 		case 2:
+			score += 1
+			scoreStr := strconv.Itoa(score)
 			if !rl.IsMusicStreamPlaying(playMusic) {
 				rl.UpdateMusicStream(playMusic)
 				rl.PlayMusicStream(playMusic)
@@ -186,8 +194,10 @@ func main() {
 			}
 
 			if player1.health == 0 {
+
 				rl.StopMusicStream(playMusic)
 				currentScreen = 6
+
 			}
 
 			rl.DrawText(texteToucheSaut, 10, 0, 20, rl.Gray)
@@ -219,8 +229,16 @@ func main() {
 					if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
 						switch button.Text {
 						case "Back":
-							player1.hitbox.Y = screenHeight - 50.0
-							platform1.hitbox.X = screenWidth
+							score = 0
+							player1 = newPlayer(rl.NewRectangle(screenWidth/8, screenHeight-50.0, 50, 50))
+
+							platform0 = newPlatform(dimPlatform0)
+							platform1 = newPlatform(dimPlatform1)
+							platform2 = newPlatform(dimPlatform2)
+							platforms = [3]*platform{platform0, platform1, platform2}
+
+							ennemi0 = newEnnemi(rl.NewRectangle(screenWidth, screenHeight-50, 30, 30))
+							ennemis = [1]*ennemi{ennemi0}
 							rl.StopMusicStream(playMusic)
 							currentScreen = 1
 						}
@@ -229,6 +247,7 @@ func main() {
 				//Affichage du bouton
 				rl.DrawRectangleRounded(button.Bounds, ratioArrondiRec, segmentRec, color)
 				rl.DrawText(button.Text, int32(button.Bounds.X+button.Bounds.Width/2)-rl.MeasureText(button.Text, 20)/2, int32(button.Bounds.Y+10), 20, rl.Black)
+				rl.DrawText(scoreStr, screenWidth-100, 50, 50.0, rl.White)
 			}
 			rl.EndDrawing()
 		case 3:
@@ -290,16 +309,16 @@ func main() {
 			rl.DrawTexture(bgMapKey, 0, 0, rl.White)
 			currentScreen, toucheSaut = ui.KeybindingScreen(currentScreen, ratioArrondiRec, segmentRec, bgLogo, bgMusic)
 		case 6:
-			player1 = newPlayer(rl.NewRectangle(screenWidth/8, screenHeight-50.0, 50, 50))
+			player1 = newPlayer(dimPlayer1)
 
-			platform0 = newPlatform(rl.NewRectangle(screenWidth, screenHeight-150, 150, 50))
-			platform1 = newPlatform(rl.NewRectangle(screenWidth+200, screenHeight-250, 150, 50))
-			platform2 = newPlatform(rl.NewRectangle(screenWidth+400, screenHeight-300, 150, 50))
+			platform0 = newPlatform(dimPlatform0)
+			platform1 = newPlatform(dimPlatform1)
+			platform2 = newPlatform(dimPlatform2)
 			platforms = [3]*platform{platform0, platform1, platform2}
 
-			ennemi0 = newEnnemi(rl.NewRectangle(screenWidth, screenHeight-50, 30, 30))
+			ennemi0 = newEnnemi(dimEnnemi0)
 			ennemis = [1]*ennemi{ennemi0}
-			currentScreen = ui.GameoverScreen(currentScreen, ratioArrondiRec, segmentRec, bgGameOver, gameoverMusic)
+			currentScreen, score = ui.GameoverScreen(currentScreen, score, ratioArrondiRec, segmentRec, bgGameOver, gameoverMusic)
 		}
 
 	}
